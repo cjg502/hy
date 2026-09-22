@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>回忆长河 - 客户端下载</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        body {
+            /* 背景图，把你的背景图替换这里的图片路径 */
+            background: url("/picture/bg_download.jpg") no-repeat center center;
+            background-size: cover;
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* 半透明遮罩，提升文字按钮可读性 */
+        .mask {
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0,0,0,0.45);
+            z-index: 1;
+        }
+        .download-wrap {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding:20px;
+        }
+        .title {
+            font-size:42px;
+            color:#ffdd77;
+            text-shadow: 2px 2px 6px #000000;
+            margin-bottom:60px;
+        }
+        .download-item {
+            margin-bottom:36px;
+        }
+        .main-btn {
+            display: inline-block;
+            min-width:240px;
+            padding:14px 24px;
+            font-size:20px;
+            color:#fff;
+            background: linear-gradient(180deg,#c48c38,#8b5c18);
+            border:2px solid #ffdd77;
+            border-radius:8px;
+            text-decoration:none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+            transition: all 0.25s;
+        }
+        .main-btn:hover {
+            background: linear-gradient(180deg,#e6a846,#a36d20);
+        }
+        .link-group {
+            margin-top:12px;
+        }
+        .link-group a {
+            color:#ffe9b8;
+            font-size:16px;
+            text-decoration: none;
+            margin:0 14px;
+            text-shadow:1px 1px 3px #000;
+        }
+        .link-group a:hover {
+            color:#ffffff;
+            text-decoration: underline;
+        }
+        /* 复制密码按钮样式 */
+        .copy-pwd{
+            cursor: pointer;
+            color:#ffe9b8;
+            font-size:16px;
+            text-shadow:1px 1px 3px #000;
+            margin:0 14px;
+            display: inline-block;
+        }
+        .copy-pwd:hover{
+            color:#ffffff;
+            text-decoration: underline;
+        }
+        /*移动端适配*/
+        @media screen and (max-width:768px){
+            .title{
+                font-size:28px;
+                margin-bottom:40px;
+            }
+            .main-btn{
+                min-width:200px;
+                font-size:17px;
+                padding:12px 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="mask"></div>
+<div class="download-wrap">
+    <h1 class="title">回忆传奇 · 客户端下载</h1>
+    <!-- PC客户端 -->
+    <div class="download-item">
+        <a class="main-btn" href="#">PC客户端下载</a>
+        <div class="link-group">
+            <a href="https://wwate.lanzoue.com/ieJ9L49ft11a">网盘下载</a>
+        </div>
+    </div>
+    <!-- 安卓 -->
+    <div class="download-item">
+        <a class="main-btn" href="#">安卓客户端下载</a>
+        <div class="link-group">
+            <span class="copy-pwd" data-pwd="9vyb">（点击复制）密码:9vyb</span>
+            <a href="https://wwate.lanzoue.com/iswew49fsyne">网盘下载</a>
+        </div>
+    </div>
+    <!-- 苹果 -->
+    <div class="download-item">
+        <a class="main-btn" href="#">苹果IOS下载</a>
+        <div class="link-group">
+            <span class="copy-pwd">本地下载(制作中)</span>
+            <a href="#">网盘下载(制作中)</a>
+        </div>
+    </div>
+</div>
+
+<script>
+//复制密码逻辑
+document.querySelectorAll('.copy-pwd').forEach(item=>{
+    item.addEventListener('click',async function(){
+        const pwd = this.dataset.pwd;
+        if(!pwd) return;
+        try{
+            await navigator.clipboard.writeText(pwd);
+            alert("已复制密码到剪贴板");
+        }catch(err){
+            //兼容部分旧浏览器
+            const input = document.createElement('input');
+            input.value = pwd;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+            alert("已复制密码到剪贴板");
+        }
+    })
+})
+</script>
+
+</body>
+</html>
