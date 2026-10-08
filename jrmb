@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RED 假人脚本生成器 · 完整版</title>
+<style>
+:root{
+  --bg:#f4f6f8;--card:#fff;--ink:#1b1f24;--sub:#5c6672;--line:#e2e6eb;
+  --acc:#a8342a;--acc2:#1668a0;--ok:#1a7a4c;--warn:#a8790a;--code:#f3f5f8;--code2:#eef1f5;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:14.5px/1.7 "Microsoft YaHei","PingFang SC",-apple-system,sans-serif}
+header{background:#fff;border-bottom:1px solid var(--line);padding:14px 22px;position:sticky;top:0;z-index:30}
+header h1{margin:0 0 3px;font-size:19px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+header h1 .tag{font-size:11px;font-weight:600;background:var(--acc);color:#fff;padding:2px 8px;border-radius:4px}
+header h1 .tag2{font-size:11px;font-weight:600;background:var(--acc2);color:#fff;padding:2px 8px;border-radius:4px}
+header p{margin:0;color:var(--sub);font-size:12.5px}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.02fr);gap:16px;
+  max-width:1680px;margin:0 auto;padding:16px 20px;align-items:start}
+@media(max-width:1100px){.wrap{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:16px 18px;margin-bottom:14px}
+.panel>h2{margin:0 0 13px;font-size:14.5px;padding-bottom:8px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:8px}
+.panel>h2 .n{background:var(--acc2);color:#fff;width:20px;height:20px;border-radius:50%;
+  display:grid;place-items:center;font-size:11px;font-weight:700;flex:none}
+.panel>h2 .cnt{margin-left:auto;font-size:11.5px;font-weight:400;color:var(--sub)}
+fieldset{border:1px solid var(--line);border-radius:9px;padding:12px 14px;margin:0 0 12px}
+legend{font-size:12.5px;font-weight:700;color:var(--acc2);padding:0 6px}
+label{display:block;margin-bottom:10px}
+label:last-child{margin-bottom:0}
+label .lb{display:block;font-size:12.3px;color:var(--sub);margin-bottom:3px}
+label .lb b{color:var(--acc)}
+input[type=text],input[type=number],select,textarea{
+  width:100%;padding:6px 9px;border:1px solid var(--line);border-radius:6px;
+  font-size:13.5px;font-family:inherit;background:#fff;color:var(--ink)}
+textarea{font-family:Consolas,monospace;font-size:12.3px;line-height:1.6;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--acc2);outline-offset:-1px;border-color:var(--acc2)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 11px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 11px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:0 11px}
+@media(max-width:660px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.row{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.chk{display:flex;align-items:flex-start;gap:6px;margin-bottom:7px;cursor:pointer}
+.chk input{margin-top:4px;flex:none;width:15px;height:15px;accent-color:var(--acc)}
+.chk span{font-size:13.2px}
+.chk small{display:block;color:var(--sub);font-size:11.7px;line-height:1.5}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:7px 14px;
+  border-radius:6px;font-size:13.5px;cursor:pointer;font-family:inherit}
+.btn:hover{border-color:var(--acc2);color:var(--acc2)}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+.btn.pri:hover{background:#8e2a22;color:#fff}
+.btn.sm{padding:3px 9px;font-size:11.8px}
+.btn.xs{padding:2px 7px;font-size:11px}
+#out{background:#1d232b;color:#dde5ed;border-radius:9px;padding:14px 16px;
+  font:12.3px/1.68 Consolas,"Courier New",monospace;white-space:pre-wrap;word-break:break-all;
+  height:calc(100vh - 260px);min-height:420px;overflow:auto;margin:0}
+#out .c{color:#7cb3e8;font-weight:600}#out .k{color:#f0b775}#out .s{color:#9ad48a}
+#out .v{color:#e78fb3}#out .m{color:#7f8792;font-style:italic}#out .d{color:#5d6773}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.tabs button{border:1px solid var(--line);background:#fff;padding:4px 10px;border-radius:5px;
+  font-size:12px;cursor:pointer;font-family:inherit}
+.tabs button.on{background:var(--acc2);border-color:var(--acc2);color:#fff;font-weight:600}
+.sticky{position:sticky;top:88px}
+.hint{background:#fffaf0;border-left:3px solid var(--warn);padding:8px 11px;
+  border-radius:0 6px 6px 0;font-size:12.2px;color:#6b5416;margin:10px 0}
+.hint b{color:#8a6a10}
+.note{background:#f0f7fc;border-left:3px solid var(--acc2);padding:8px 11px;
+  border-radius:0 6px 6px 0;font-size:12.2px;color:#1a4f75;margin:10px 0}
+.legend{font-size:11.8px;color:var(--sub);margin:8px 0 0;line-height:1.7}
+code{background:var(--code);padding:1px 4px;border-radius:3px;font-family:Consolas,monospace;font-size:12.2px}
+.lst{border:1px solid var(--line);border-radius:7px;padding:10px;background:#fcfcfd;margin-bottom:9px}
+.lst .hd{display:flex;align-items:center;gap:7px;margin-bottom:7px;font-size:12.3px;font-weight:700;color:var(--acc2)}
+.lst .hd .del{margin-left:auto}
+.eqrow{display:grid;grid-template-columns:88px 1fr 1fr auto;gap:7px;align-items:center;margin-bottom:6px}
+@media(max-width:660px){.eqrow{grid-template-columns:1fr}}
+.bar{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap}
+.bar button{flex:1;min-width:104px}
+.badge{font-size:10.5px;padding:1px 6px;border-radius:9px;background:var(--code2);color:var(--sub);font-weight:400}
+.warnbox{background:#fdf3f3;border:1px solid #f0c9c9;border-radius:7px;padding:9px 12px;
+  font-size:12.3px;color:#8e2a22;margin:9px 0}
+.warnbox b{display:block;margin-bottom:3px}
+</style>
+</head>
+<body>
+<header>
+  <h1>RED 假人脚本生成器<span class="tag">完整版</span><span class="tag2">参照真实脚本重构</span></h1>
+  <p>对齐《RED假人脚本（完整详情版）精修》架构：机器人定时上线 → 数据持久化 → 双定时器驱动 → QF 触发联动，可生成 9 个可直接落盘的文件。</p>
+</header>
+
+<div class="wrap">
+<div>
+  <!-- ========== 1 基础参数 ========== -->
+  <div class="panel">
+    <h2><span class="n">1</span>基础参数与路径</h2>
+    <div class="g2">
+      <label><span class="lb">脚本套名（用于注释与路径）</span><input type="text" id="packName" value="假人脚本"></label>
+      <label><span class="lb">引擎根目录（不带斜杠）</span><input type="text" id="m2root" value="..\QuestDiary\假人脚本"></label>
+    </div>
+    <div class="g3">
+      <label><span class="lb">主城地图代码</span><input type="text" id="homeMap" value="3"></label>
+      <label><span class="lb">主城坐标 X</span><input type="number" id="homeX" value="330"></label>
+      <label><span class="lb">主城坐标 Y</span><input type="number" id="homeY" value="330"></label>
+      <label><span class="lb">新人地图（低等级）</span><input type="text" id="newbieMap" value="jrdd"></label>
+      <label><span class="lb">新人在线地图上限</span><input type="number" id="maxNewbie" value="30"></label>
+      <label><span class="lb">老在线地图上限</span><input type="number" id="maxOld" value="300"></label>
+    </div>
+    <div class="hint"><b>路径约定：</b>主脚本用 <code>..\QuestDiary\假人脚本\</code> 相对路径；
+    若你的版本结构不同，改「引擎根目录」即可全局替换。</div>
+  </div>
+
+  <!-- ========== 2 机器人上线 ========== -->
+  <div class="panel">
+    <h2><span class="n">2</span>机器人上线（RobotManage）</h2>
+    <label class="chk"><input type="checkbox" id="rbEnabled" checked>
+      <span>生成 RobotManage 上线脚本<span class="badge">缓速上线</span>
+      <small>用全局变量 G88 计数，每次 <code>#AutoRun NPC</code> 触发只上线 1 个，避免瞬间爆号</small></span></label>
+    <div class="g3">
+      <label><span class="lb">上线间隔（秒）</span><input type="number" id="rbSec" value="3" min="1"></label>
+      <label><span class="lb">每次上线个数</span><input type="number" id="rbPer" value="1" min="1"></label>
+      <label><span class="lb">计数变量</span><input type="text" id="rbVar" value="G88"></label>
+      <label><span class="lb">快速上线阈值</span><input type="number" id="rbFast" value="50"></label>
+      <label><span class="lb">随机上线几率分母</span><input type="number" id="rbRandom" value="15"></label>
+      <label><span class="lb">新手区随机几率</span><input type="number" id="rbNewbieR" value="3"></label>
+    </div>
+    <div class="note">真实脚本采用「G88 上限 301 / 快速段 50 / 随机段 15」三段式。生成器按你的参数复刻该逻辑。</div>
+  </div>
+
+  <!-- ========== 3 数据持久化 ========== -->
+  <div class="panel">
+    <h2><span class="n">3</span>数据持久化（真人化核心）</h2>
+    <label class="chk"><input type="checkbox" id="dataEnabled" checked>
+      <span>生成数据保存/读取段<span class="badge">重启不丢</span>
+      <small>用 <code>WRITECONFIGFILEITEM</code> / <code>READCONFIGFILEITEM</code> 把等级、装备、货币存到 ini，
+      引擎重启后假人自动恢复，避免"每次重启都变 newbie"</small></span></label>
+    <div class="g3">
+      <label><span class="lb">保存等级阈值</span><input type="number" id="dataLevel" value="50"></label>
+      <label><span class="lb">保存间隔（秒）</span><input type="number" id="dataTimer" value="60"></label>
+      <label><span class="lb">存文件</span><input type="text" id="dataFile" value="假人数据存放.txt"></label>
+    </div>
+    <div class="g2">
+      <label><span class="lb">初始等级（新人）</span><input type="number" id="initLevel" value="3"></label>
+      <label><span class="lb">性别随机（分母，0=不随机）</span><input type="number" id="initGender" value="20"></label>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <span style="font-size:12.3px;color:var(--sub)">持久化字段：</span>
+      <div id="dataFields" style="flex:1"></div>
+    </div>
+  </div>
+
+  <!-- ========== 4 定时器功能 ========== -->
+  <div class="panel">
+    <h2><span class="n">4</span>定时器功能模块<span class="cnt" id="modCount"></span></h2>
+    <div class="note">对应真实脚本的 <code>[@OnTimer7]</code>（每 1 秒，全功能）与 <code>[@OnTimer8]</code>（每 60 秒，下图+存盘）。勾选的功能会同时生成段落与 <code>goto</code> 调用。</div>
+    <div id="modList"></div>
+  </div>
+
+  <!-- ========== 5 下图打怪 ========== -->
+  <div class="panel">
+    <h2><span class="n">5</span>下图打怪地图表<span class="cnt" id="mapCount"></span></h2>
+    <label class="chk"><input type="checkbox" id="fightEnabled" checked>
+      <span>启用下图打怪<span class="badge">按等级+人数分流</span>
+      <small>用 <code>CHECKMAPHUMANCOUNT 地图 &lt; 人数 2</code> 控制单地图假人上限，避免全挤一张图</small></span></label>
+    <div class="g2">
+      <label><span class="lb">打怪停留几率分母（越大越久）</span><input type="number" id="fightStay" value="30"></label>
+      <label><span class="lb">每次传送触发几率分母</span><input type="number" id="fightRnd" value="10"></label>
+    </div>
+    <div id="mapList"></div>
+    <div class="row" style="margin-top:7px">
+      <button type="button" class="btn sm" id="addMap">+ 添加地图</button>
+      <button type="button" class="btn sm" id="presetMap">载入示例（3 张图）</button>
+    </div>
+  </div>
+
+  <!-- ========== 6 攻沙 ========== -->
+  <div class="panel">
+    <h2><span class="n">6</span>攻沙</h2>
+    <label class="chk"><input type="checkbox" id="siegeEnabled" checked>
+      <span>启用自动攻城<span class="badge">多路点随机</span>
+      <small>检测攻城时段 + 有行会 + 在主城安全区 → 随机传送到皇宫/复活点/武器店/衣服店</small></span></label>
+    <div class="g3">
+      <label><span class="lb">触发几率分母</span><input type="number" id="siegeRnd" value="10"></label>
+      <label><span class="lb">守城停手（ISDEFENSEGUILD）</span><select id="siegeDefend"><option value="1">启用</option><option value="0">不启用</option></select></label>
+      <label><span class="lb">沙城领奖（ISCASTLEMASTER）</span><select id="siegeReward"><option value="1">启用</option><option value="0">不启用</option></select></label>
+    </div>
+    <div id="siegeList"></div>
+    <div class="row" style="margin-top:7px"><button type="button" class="btn sm" id="addSiege">+ 添加进攻点</button></div>
+  </div>
+
+  <!-- ========== 7 活动 ========== -->
+  <div class="panel">
+    <h2><span class="n">7</span>参加活动<span class="cnt" id="actCount"></span></h2>
+    <label class="chk"><input type="checkbox" id="actEnabled" checked>
+      <span>启用活动调度<span class="badge">开关变量控制</span>
+      <small>真实脚本用 <code>EQUAL A72 活动开</code> 判开关 —— 需与你的机器人活动脚本写入同一变量</small></span></label>
+    <div class="g3">
+      <label><span class="lb">活动开关变量</span><input type="text" id="actVar" value="A72"></label>
+      <label><span class="lb">开启标记值</span><input type="text" id="actOn" value="活动开"></label>
+      <label><span class="lb">关闭标记值</span><input type="text" id="actOff" value="活动关"></label>
+    </div>
+    <div id="actList"></div>
+    <div class="row" style="margin-top:7px"><button type="button" class="btn sm" id="addAct">+ 添加活动</button></div>
+  </div>
+
+  <!-- ========== 8 拾取换装 ========== -->
+  <div class="panel">
+    <h2><span class="n">8</span>拾取与智能换装</h2>
+    <label class="chk"><input type="checkbox" id="pickEnabled" checked>
+      <span>生成拾取穿装备脚本<span class="badge">属性对比</span>
+      <small>按 <code>StdMode</code> 分流到各部位，再用 <code>GETITEMFIELDVALUE</code> 取总属性对比，
+      只有更好才换——这是"穿戴拾取物品中更高级的装备"的正确实现</small></span></label>
+    <div class="g3">
+      <label><span class="lb">拾取名单文件</span><input type="text" id="pickFile" value="假人捡取物品名字.txt"></label>
+      <label><span class="lb">拾取等级参数</span><input type="number" id="pickLv" value="12"></label>
+      <label><span class="lb">对比属性项数</span><select id="pickAttr"><option value="3">攻击+防御+魔防（标准）</option><option value="2">防御+魔防（复古）</option></select></label>
+    </div>
+    <div id="slotList"></div>
+    <div class="row" style="margin-top:7px">
+      <button type="button" class="btn sm" id="addSlot">+ 添加部位</button>
+      <button type="button" class="btn sm" id="presetSlot">载入全部 14 个部位</button>
+    </div>
+  </div>
+
+  <!-- ========== 9 QF 联动 ========== -->
+  <div class="panel">
+    <h2><span class="n">9</span>QM 初始化 与 QFunction 联动</h2>
+    <label class="chk"><input type="checkbox" id="qmEnabled" checked>
+      <span>生成 QManage段落（登录时初始化假人）<span class="badge">你要求的入口</span>
+      <small>落在 <code>Envir\MapQuest_def\QManage.txt</code> 的 <code>[@Login]</code> 段：
+      用 <code>#CALL</code> 调用主脚本的 <code>[@假人启动初始化]</code>，
+      并用标识 <code>[900]</code> 做一次性守卫，避免重复初始化</small></span></label>
+    <label class="chk"><input type="checkbox" id="qfEnabled" checked>
+      <span>生成 QFunction-0 段落<span class="badge">死亡复活 / 拾取 / 升级</span>
+      <small>死亡后随机延时复活、按等级送装备技能、拾取时联动换装</small></span></label>
+    <div class="g3">
+      <label><span class="lb">复活延时（毫秒）</span><input type="number" id="qfRevive" value="2000"></label>
+      <label><span class="lb">升级学技能等级段</span><input type="number" id="qfSkillLv" value="49"></label>
+      <label><span class="lb">随机变性等级</span><input type="number" id="qfGenderLv" value="5"></label>
+    </div>
+    <label class="chk"><input type="checkbox" id="qfTaunt" checked>
+      <span>被打/主动攻击时随机骂街话<span class="badge">拟人化</span>
+      <small>用 <code>DELAYCALL</code> 延时，避免同步刷屏</small></span></label>
+  </div>
+
+  <!-- ========== 10 输出 ========== -->
+  <div class="panel">
+    <h2><span class="n">10</span>输出</h2>
+    <div class="g2">
+      <label><span class="lb">上线欢迎语</span><input type="text" id="msgWelcome" value="★玛法勇士〖%s〗来到&lt;$SERVERNAME&gt;，祝您游戏愉快！"></label>
+      <label><span class="lb">新建行会数量上限</span><input type="number" id="guildMax" value="3"></label>
+    </div>
+    <div class="g3">
+      <label><span class="lb">自动升级经验/秒</span><input type="number" id="autoExp" value="100000"></label>
+      <label><span class="lb">自动回血/回蓝</span><input type="number" id="autoHp" value="100"></label>
+      <label><span class="lb">保护血量百分比</span><input type="number" id="protectPct" value="20"></label>
+    </div>
+    <label class="chk"><input type="checkbox" id="outGuild" checked>
+      <span>附带行会名单 / 充值档位 / 装备元素配套<span class="badge">数据文件</span></span></label>
+    <label class="chk"><input type="checkbox" id="outDummyCfg" checked>
+      <span>附带 Dummys 假人配置模板<span class="badge">300 个文件可批量生成</span></span></label>
+    <label class="chk"><input type="checkbox" id="outReadme" checked>
+      <span>附带部署说明<span class="badge">照着做即可</span></span></label>
+    <label class="chk"><input type="checkbox" id="batchDummy" checked>
+      <span>按名单批量生成 Dummys 配置<span class="badge">每假人一文件</span>
+      <small>读取「假人名单」逐个在 <code>Envir/Dummys/</code> 下建同名 .txt，
+      免得手工复制几百份。名单为空则只输出 1 份模板</small></span></label>
+    <label><span class="lb">假人名单（每行一个，与 AICharNameList.txt 一致）</span>
+      <textarea id="dummyNames" rows="4" placeholder="一世白头&#10;一刀&#10;三国王维&#10;…"></textarea></label>
+
+    <fieldset style="margin-top:12px">
+      <legend>一键落盘（直接创建文件夹与文件）</legend>
+      <div class="warnbox" id="fsWarn">
+        <b>当前浏览器不支持直接写入本地文件夹</b>
+        请用 <b>Chrome / Edge</b> 打开本页面；或改用下方「打包下载 ZIP」。
+      </div>
+      <div class="grid2">
+        <label><span class="lb">写入目标 = 你选择的文件夹（通常是 Mir200）</span>
+          <input type="text" id="fsRoot" value="未选择" readonly
+            style="background:var(--code);font-size:12.5px"></label>
+        <label><span class="lb">文件编码（引擎读取用）</span>
+          <select id="encSel">
+            <option value="gbk">GBK / ANSI（Mir200 默认，推荐）</option>
+            <option value="utf8">UTF-8（部分版本支持）</option>
+            <option value="utf8bom">UTF-8 with BOM</option>
+          </select></label>
+      </div>
+      <label class="chk"><input type="checkbox" id="fsAppendQF" checked>
+        <span>QFunction-0.txt 追加而非覆盖<span class="badge">防止毁掉原有脚本</span>
+        <small>取消勾选则整份覆盖，风险自负</small></span></label>
+      <div class="bar" style="margin-bottom:0">
+        <button class="btn pri" id="fsPick">📁 选择 Mir200 文件夹</button>
+        <button class="btn" id="fsWrite" disabled>💾 写入全部文件</button>
+        <button class="btn" id="dlZip">⬇ 打包下载 ZIP</button>
+        <button class="btn" id="genBtn">⚡ 刷新预览</button>
+        <button class="btn" id="resetBtn">重置</button>
+      </div>
+      <div id="fsLog" style="margin-top:9px"></div>
+    </fieldset>
+  </div>
+</div>
+
+<!-- ============ 输出 ============ -->
+<div class="sticky">
+  <div class="panel">
+    <h2>生成结果<span class="cnt" id="outInfo"></span></h2>
+    <div class="tabs" id="tabs"></div>
+    <pre id="out">点击「⚡ 生成全部文件」开始…</pre>
+    <p class="legend">
+      高亮：<span style="color:#1668a0;font-weight:600">段落/条件</span> ·
+      <span style="color:#a8790a">命令</span> ·
+      <span style="color:#1a7a4c">变量</span> ·
+      <span style="color:#e78fb3">常量引用</span> ·
+      <span style="color:#7f8792;font-style:italic">注释</span>
+    </p>
+  </div>
+</div>
+</div>
+
+<script>
+/* ==========================================================================
+   参照《RED假人脚本（完整详情版）精修》重构
+   关键机制：RobotManage 缓速上线 / WRITECONFIGFILEITEM 数据持久化
+             SETSCTIMER 7(1s) + 8(60s) 双定时器驱动 / QFunction 联动
+   ========================================================================== */
+
+/* ---------- 常量表（取自 CHM 装备位置 + 真实脚本 StdMode） ---------- */
+/* 装备位置表：pos = 引擎装备位置编号，name = 部位名，
+   var = 该部位对应的身上装备变量，sm = 该部位的 StdMode（拾取分流用）
+   —— 三者由pos 唯一决定，改位置即自动带出标签名与变量 */
+const SLOTS=[
+  {pos:0, name:'衣服',  var:'<$DRESS>',      sm:'10,11'},
+  {pos:1, name:'武器',  var:'<$WEAPON>',     sm:'5,6'},
+  {pos:2, name:'勋章',  var:'<$RIGHTHAND>',  sm:'30'},
+  {pos:3, name:'项链',  var:'<$NECKLACE>',   sm:'19,20,21'},
+  {pos:4, name:'头盔',  var:'<$HELMET>',     sm:'15'},
+  {pos:5, name:'左手镯',var:'<$ARMRING_L>',  sm:'24,26'},
+  {pos:6, name:'右手镯',var:'<$ARMRING_R>',  sm:'24,26'},
+  {pos:7, name:'左戒指',var:'<$RING_L>',     sm:'22,23'},
+  {pos:8, name:'右戒指',var:'<$RING_R>',     sm:'22,23'},
+  {pos:9, name:'毒符',  var:'<$BUJUK>',      sm:'25'},
+  {pos:10,name:'腰带',  var:'<$BELT>',       sm:'27'},
+  {pos:11,name:'靴子',  var:'<$BOOTS>',      sm:'28'},
+  {pos:12,name:'宝石',  var:'<$CHARM>',      sm:'7'},
+  {pos:13,name:'斗笠',  var:'<$HELMETEX>',   sm:'16'},
+];
+const slotOf=pos=>SLOTS.find(s=>s.pos===Number(pos))||null;
+/* 由位置生成默认标签名与变量 */
+function slotDefaults(pos){
+  const s=slotOf(pos);
+  return{ name:s?('@'+s.name+'更换'):('@部位'+pos+'更换'),
+          var:s?s.var:'<$DRESS>' };
+}
+
+/* ---------- 可勾选的定时器功能模块 ---------- */
+const MODULES=[
+  {id:'mLevel',  label:'自动升级',       desc:'每 1 秒加经验（可用 NOT ISONMAP 排除特定地图）'},
+  {id:'mHp',     label:'自动回血回蓝',   desc:'HUMANHP / HUMANMP 定时恢复'},
+  {id:'mProtect',label:'血量保护回城',   desc:'血量低于百分比随机传送或回城'},
+  {id:'mRandom', label:'无怪地图随机传送', desc:'指定地图没怪了就飞随机'},
+  {id:'mRecycle',label:'自动回收装备',   desc:'回收指定装备换元宝（TAKEBAGITEM）'},
+  {id:'mPay',    label:'自动充值',       desc:'按档位随机元宝，喊话晒充值'},
+  {id:'mShout',  label:'自动喊话',       desc:'扣元宝随机读文本喊话'},
+  {id:'mGuild',  label:'自动创会/入会',  desc:'随机行会名创会（G9 限数）+ 已创行会入会'},
+  {id:'mDonate', label:'自动捐献',       desc:'按条件自动捐献'},
+  {id:'mRun',    label:'主城随机跑动',   desc:'在主城范围随机走位'},
+  {id:'mStrength',label:'强化装备元素',  desc:'按装备名映射元素编号并强化'},
+  {id:'mRage',   label:'自动开狂暴',     desc:'CHANGEMODE 开狂暴模式'},
+  {id:'mCurrency',label:'自动吃货币',    desc:'自动使用货币'},
+  {id:'mAutoEq', label:'自动穿戴装备',   desc:'按等级/条件 TAKEON'},
+  {id:'mFight',  label:'下图打怪',       desc:'多地图按等级+人数分流'},
+  {id:'mSiege',  label:'自动攻城',       desc:'攻沙时段随机飞进攻点'},
+  {id:'mAct',    label:'自动参加活动',   desc:'按活动开关变量进出活动图'},
+];
+
+/* ---------- 持久化字段 ---------- */
+const DFIELDS=[
+  {k:'职业',v:'<$JOB>'},{k:'性别',v:'<$GENDER>'},{k:'等级',v:'<$LEVEL>'},{k:'经验',v:'<$EXP>'},
+  {k:'武器',v:'<$WEAPON>'},{k:'衣服',v:'<$DRESS>'},{k:'头盔',v:'<$HELMET>'},{k:'项链',v:'<$NECKLACE>'},
+  {k:'左手',v:'<$ARMRING_L>'},{k:'右手',v:'<$ARMRING_R>'},{k:'左戒',v:'<$RING_L>'},{k:'右戒',v:'<$RING_R>'},
+  {k:'腰带',v:'<$BELT>'},{k:'靴子',v:'<$BOOTS>'},{k:'斗笠',v:'<$HELMETEX>'},{k:'勋章',v:'<$RIGHTHAND>'},
+  {k:'圣心',v:'<$BUJUK>'},{k:'血石',v:'<$CHARM>'},{k:'元宝',v:'<$GAMEGOLD>'},
+  {k:'绑元',v:'<$GAMEGIRD>'},{k:'积分',v:'<$GAMEDIAMOND>'},{k:'金币',v:'<$GOLDCOUNT>'},
+];
+
+/* ---------- 状态 ---------- */
+const state={ maps:[], siege:[], acts:[], slots:[], df:DFIELDS.map(x=>({...x})), mods:{} };
+MODULES.forEach(m=>state.mods[m.id]=true);
+
+const $=id=>document.getElementById(id);
+const val=id=>{const e=$(id);return e?String(e.value).trim():''};
+const num=id=>{const v=parseInt(val(id),10);return isNaN(v)?0:v};
+const chk=id=>{const e=$(id);return e?e.checked:false};
+
+/* ---------- 动态列表渲染 ---------- */
+function renderMods(){
+  const w=$('modList');
+  w.innerHTML=MODULES.map(m=>`<label class="chk"><input type="checkbox" data-mod="${m.id}" ${state.mods[m.id]?'checked':''}>
+    <span>${m.label}<small>${m.desc}</small></span></label>`).join('');
+  w.querySelectorAll('[data-mod]').forEach(c=>c.onchange=()=>{state.mods[c.dataset.mod]=c.checked;});
+  $('modCount').textContent='已选 '+MODULES.filter(m=>state.mods[m.id]).length+' / '+MODULES.length;
+}
+function renderMaps(){
+  const w=$('mapList');
+  if(!state.maps.length){w.innerHTML='<p class="legend">暂无地图。</p>';$('mapCount').textContent='';return}
+  w.innerHTML=state.maps.map((m,i)=>`<div class="lst"><div class="hd">
+      <input type="text" data-m-map="${i}" value="${m.map}" style="width:120px" placeholder="地图代码">
+      <input type="number" data-m-min="${i}" value="${m.min}" style="width:88px" title="最低等级">
+      <span style="font-weight:400">级以上</span>
+      <input type="number" data-m-max="${i}" value="${m.max}" style="width:88px" title="地图人数上限">
+      <span style="font-weight:400">人内</span>
+      <input type="text" data-m-tip="${i}" value="${m.tip}" placeholder="提示语" style="flex:1;min-width:90px">
+      <button type="button" class="btn xs del" data-m-del="${i}">删</button></div></div>`).join('');
+  const upd=(i,k,v)=>state.maps[i][k]=v;
+  w.querySelectorAll('[data-m-map]').forEach(e=>e.oninput=()=>upd(+e.dataset.mMap,'map',e.value));
+  w.querySelectorAll('[data-m-min]').forEach(e=>e.oninput=()=>upd(+e.dataset.mMin,'min',parseInt(e.value,10)||0));
+  w.querySelectorAll('[data-m-max]').forEach(e=>e.oninput=()=>upd(+e.dataset.mMax,'max',parseInt(e.value,10)||0));
+  w.querySelectorAll('[data-m-tip]').forEach(e=>e.oninput=()=>upd(+e.dataset.mTip,'tip',e.value));
+  w.querySelectorAll('[data-m-del]').forEach(b=>b.onclick=()=>{state.maps.splice(+b.dataset.mDel,1);renderMaps()});
+  $('mapCount').textContent=state.maps.length+' 张';
+}
+function renderSiege(){
+  const w=$('siegeList');
+  if(!state.siege.length){w.innerHTML='';return}
+  w.innerHTML=state.siege.map((s,i)=>`<div class="lst"><div class="hd">
+    <input type="text" data-s-map="${i}" value="${s.map}" style="width:100px" placeholder="地图">
+    <input type="number" data-s-x="${i}" value="${s.x}" style="width:80px" placeholder="X">
+    <input type="number" data-s-y="${i}" value="${s.y}" style="width:80px" placeholder="Y">
+    <input type="number" data-s-r="${i}" value="${s.r}" style="width:72px" title="随机范围">
+    <input type="number" data-s-p="${i}" value="${s.p}" style="width:72px" title="几率分母">
+    <button type="button" class="btn xs del" data-s-del="${i}">删</button></div></div>`).join('');
+  const u=(i,k,f)=>w.querySelectorAll(`[data-s-${k}]`).forEach(e=>e.oninput=()=>state.siege[i][f]=f==='map'?e.value:(parseInt(e.value,10)||0));
+  state.siege.forEach((_,i)=>{u(i,'map','map');u(i,'x','x');u(i,'y','y');u(i,'r','r');u(i,'p','p')});
+  w.querySelectorAll('[data-s-del]').forEach(b=>b.onclick=()=>{state.siege.splice(+b.dataset.sDel,1);renderSiege()});
+}
+function renderActs(){
+  const w=$('actList');
+  if(!state.acts.length){w.innerHTML='<p class="legend">暂无活动。</p>';$('actCount').textContent='';return}
+  w.innerHTML=state.acts.map((a,i)=>`<div class="lst"><div class="hd">
+    <input type="text" data-a-name="${i}" value="${a.name}" style="width:130px" placeholder="活动名">
+    <input type="text" data-a-map="${i}" value="${a.map}" style="width:110px" placeholder="活动地图">
+    <input type="number" data-a-max="${i}" value="${a.max}" style="width:80px" title="人数上限">
+    <span style="font-weight:400">人内</span>
+    <select data-a-mode="${i}" style="width:130px">
+      ${['只还击(DUMMYSTOP)','主动攻击(DUMMYSTART)','来去自如'].map(m=>`<option${a.mode===m?' selected':''}>${m}</option>`).join('')}
+    </select>
+    <input type="number" data-a-rnd="${i}" value="${a.rnd}" style="width:72px" title="进场几率">
+    <button type="button" class="btn xs del" data-a-del="${i}">删</button></div></div>`).join('');
+  w.querySelectorAll('[data-a-name]').forEach(e=>e.oninput=()=>state.acts[+e.dataset.aName].name=e.value);
+  w.querySelectorAll('[data-a-map]').forEach(e=>e.oninput=()=>state.acts[+e.dataset.aMap].map=e.value);
+  w.querySelectorAll('[data-a-max]').forEach(e=>e.oninput=()=>state.acts[+e.dataset.aMax].max=parseInt(e.value,10)||0);
+  w.querySelectorAll('[data-a-mode]').forEach(e=>e.onchange=()=>state.acts[+e.dataset.aMode].mode=e.target.value);
+  w.querySelectorAll('[data-a-rnd]').forEach(e=>e.oninput=()=>state.acts[+e.dataset.aRnd].rnd=parseInt(e.value,10)||0);
+  w.querySelectorAll('[data-a-del]').forEach(b=>b.onclick=()=>{state.acts.splice(+b.dataset.aDel,1);renderActs()});
+  $('actCount').textContent=state.acts.length+' 个';
+}
+function renderSlots(){
+  const w=$('slotList');
+  if(!state.slots.length){w.innerHTML='<p class="legend">暂无部位，点「添加部位」自动带入标签名与装备变量。</p>';return}
+  const opts=SLOTS.map(s=>`<option value="${s.pos}">${s.pos} ${s.name}</option>`).join('');
+  w.innerHTML=state.slots.map((s,i)=>{
+    const sm=(slotOf(s.pos)||{sm:''}).sm;
+    return `<div class="eqrow" title="StdMode：${sm||'—'}">
+    <select data-sl-sel="${i}">${opts.replace(`value="${s.pos}"`,`value="${s.pos}" selected`)}</select>
+    <input type="text" data-sl-name="${i}" value="${s.name}" placeholder="标签名">
+    <input type="text" data-sl-var="${i}" value="${s.var}" placeholder="装备变量">
+    <button type="button" class="btn xs del" data-sl-del="${i}" title="删除该部位">删</button></div>`;
+  }).join('');
+  // 切换位置 → 自动同步标签名与装备变量（保持三者一致）
+  w.querySelectorAll('[data-sl-sel]').forEach(e=>e.onchange=()=>{
+    const i=+e.dataset.slSel, pos=parseInt(e.value,10);
+    state.slots[i].pos=pos;
+    const d=slotDefaults(pos);
+    state.slots[i].name=d.name;
+    state.slots[i].var=d.var;
+    renderSlots();
+  });
+  w.querySelectorAll('[data-sl-name]').forEach(e=>e.oninput=()=>state.slots[+e.dataset.slName].name=e.value);
+  w.querySelectorAll('[data-sl-var]').forEach(e=>e.oninput=()=>state.slots[+e.dataset.slVar].var=e.value);
+  w.querySelectorAll('[data-sl-del]').forEach(b=>b.onclick=()=>{state.slots.splice(+b.dataset.slDel,1);renderSlots()});
+}
+function renderDF(){
+  const w=$('dataFields');
+  w.innerHTML=state.df.map((f,i)=>`<span class="chk" style="display:inline-flex;margin:0 8px 4px 0;font-size:12px">
+    <input type="checkbox" data-df="${i}" ${f.on!==false?'checked':''}><span>${f.k}</span></span>`).join('');
+  w.querySelectorAll('[data-df]').forEach(c=>c.onchange=()=>state.df[+c.dataset.df].on=c.checked);
+}
+function renderAll(){renderMods();renderMaps();renderSiege();renderActs();renderSlots();renderDF()}
+
+/* ---------- 按钮 ---------- */
+$('addMap').onclick=()=>{state.maps.push({map:'D001',min:35,max:20,tip:'进入初级地图，祝您收获满满！'});renderMaps()};
+$('presetMap').onclick=()=>{state.maps=[
+  {map:'D601',min:0,max:20,tip:'进入初级地图，祝您收获满满！'},
+  {map:'D501',min:35,max:30,tip:'进入中级地图，祝您收获满满！'},
+  {map:'SW01',min:45,max:30,tip:'进入高级地图，祝您收获满满！'}];renderMaps()};
+$('addSiege').onclick=()=>{state.siege.push({map:'0150',x:0,y:0,r:0,p:10});renderSiege()};
+$('addAct').onclick=()=>{state.acts.push({name:'激情泡点',map:'jiqingpaodian',max:50,mode:'只还击(DUMMYSTOP)',rnd:20});renderActs()};
+/* 新增部位：自动选第一个未占用的位置，并带出对应标签名与装备变量 */
+$('addSlot').onclick=()=>{
+  const used=new Set(state.slots.map(s=>s.pos));
+  const free=SLOTS.find(s=>!used.has(s.pos));
+  if(!free){ alert('14 个常用部位已全部添加完毕。'); return; }
+  state.slots.push({pos:free.pos, name:'@'+free.name+'更换', var:free.var});
+  renderSlots();
+};
+/* 一键补齐全部部位：保留已配置的，自动去重并按位置排序 */
+$('presetSlot').onclick=()=>{
+  const map=new Map(state.slots.map(s=>[s.pos,s]));
+  SLOTS.forEach(s=>{ if(!map.has(s.pos)) map.set(s.pos,{pos:s.pos,name:'@'+s.name+'更换',var:s.var}); });
+  state.slots=[...map.values()].sort((a,b)=>a.pos-b.pos);
+  renderSlots();
+};
+$('resetBtn').onclick=()=>{if(confirm('确定重置所有配置？'))location.reload()};
+
+/* ==========================================================================
+   生成引擎
+   ========================================================================== */
+const p=()=>val('m2root');                    // 脚本根目录（相对 Mir200）
+const pack=()=>val('packName')||'假人脚本';
+const homeMap=()=>val('homeMap');
+const homeX=()=>num('homeX'), homeY=()=>num('homeY');
+const delay=()=>`DELAYGOTO <$STR(N55)>`;      // 统一随机延时写法
+
+/* ---------- 文件 1：RobotManage 缓速上线 ---------- */
+function genRobot(){
+  if(!chk('rbEnabled'))return null;
+  const V=val('rbVar')||'G88', L=[];
+  L.push(`;==================== 假人缓速上线 ====================`);
+  L.push(`;放置路径：Mir200\\Envir\\Robot_def\\RobotManage.txt`);
+  L.push(`;配合 AutoRunRobot.txt 的 #AutoRun NPC ${num('rbSec')} @假人上线 生效`);
+  L.push(`;原理：用全局变量 ${V} 计数，每次触发只上线 ${num('rbPer')} 个，避免瞬间爆号`);
+  L.push(``);
+  L.push(`[@假人上线]`);
+  L.push(`;---- 总量护栏：超过上限直接退出 ----`);
+  L.push(`#IF`);
+  L.push(`large ${V} ${num('maxOld')}`);
+  L.push(`#ACT`);
+  L.push(`break`);
+  L.push(``);
+  L.push(`;---- 快速上线段：老区先拉满到快速阈值 ----`);
+  L.push(`#IF`);
+  L.push(`small ${V} ${num('rbFast')}`);
+  L.push(`#ACT`);
+  L.push(`INC ${V} 1`);
+  L.push(`DUMMYLOGON ${homeMap()} ${homeX()} ${homeY()} 10 ${num('rbPer')}`);
+  L.push(`break`);
+  L.push(``);
+  L.push(`;---- 新人区段 ----`);
+  L.push(`#IF`);
+  L.push(`small ${V} ${num('maxNewbie')}`);
+  L.push(`random ${num('rbNewbieR')}`);
+  L.push(`#ACT`);
+  L.push(`INC ${V} 1`);
+  L.push(`DUMMYLOGON ${val('newbieMap')} 15 15 10 ${num('rbPer')}`);
+  L.push(`break`);
+  L.push(``);
+  L.push(`;---- 随机上线段：让假人看起来是陆续登录的 ----`);
+  L.push(`#IF`);
+  L.push(`random ${num('rbRandom')}`);
+  L.push(`#ACT`);
+  L.push(`INC ${V} 1`);
+  L.push(`DUMMYLOGON ${val('newbieMap')} 15 15 10 ${num('rbPer')}`);
+  L.push(`break`);
+  return {name:'① RobotManage.txt（缓速上线）', path:'Envir/Robot_def/RobotManage.txt', text:L.join('\n')};
+}
+
+/* ---------- 文件 2：AutoRunRobot 触发器 ---------- */
+function genAutoRun(){
+  if(!chk('rbEnabled'))return null;
+  return {name:'② AutoRunRobot.txt（定时触发）', path:'Envir/Robot_def/AutoRunRobot.txt',
+    text:`#AutoRun NPC ${num('rbSec')} @假人上线\n; 上线间隔 ${num('rbSec')} 秒，着急上人改为 1\n; 上限由 RobotManage 中的 ${val('rbVar')||'G88'} 控制`};
+}
+
+/* ---------- 文件 3：主脚本 1假人启动初始化.txt ---------- */
+function genMain(){
+  const L=[]; const mod=id=>state.mods[id];
+  const timer7=[], timer8=[];   // 两个定时器各要调用的段落
+
+  L.push(`;====================================================`);
+  L.push(`;  ${pack()} · 主脚本`);
+  L.push(`;  落盘：Mir200\\Envir\\QuestDiary\\${pack()}\\1假人启动初始化.txt`);
+  L.push(`;  进入方式：在 QManage.txt的 [@Login] 段用 #CALL 调用（见⑥ QManage 文件）`);
+  L.push(`;====================================================`);
+  L.push(``);
+  L.push(`[@假人启动初始化]`);
+  L.push(`#if`);
+  L.push(`ISDUMMY`);
+  L.push(`#act`);
+  L.push(`;---- 读取历史数据，判断新人和老人 ----`);
+  if(mod('mAutoEq')) L.push(`#CALL [\\${pack()}\\拾取穿装备.txt] @配置预处理`);
+  if(chk('dataEnabled')){
+    L.push(`READCONFIGFILEITEM ${p()}\\${val('dataFile')} <$USERNAME> 等级 S$假人等级`);
+    L.push(``);
+    L.push(`#if`);
+    L.push(`NOT equal <$STR(S$假人等级)>`);
+    L.push(`#act`);
+    L.push(`goto @新人启动`);
+    L.push(`#ELSEACT`);
+    L.push(`goto @老人启动`);
+  }else{
+    L.push(`goto @新人启动`);
+  }
+  L.push(``);
+
+  /* --- 新人启动 --- */
+  L.push(`[@新人启动]`);
+  L.push(``, `;---- 随机性别（分母越小概率越高） ----`);
+  if(num('initGender')>0){
+    L.push(`#IF`); L.push(`random ${num('initGender')}`); L.push(`#ACT`);
+    L.push(`CHANGEGENDER 1`); L.push(`break`); L.push(``);
+  }
+  L.push(`;---- 开启双定时器：7 号每 1 秒跑功能，8 号每 ${num('dataTimer')} 秒下图+存盘 ----`);
+  L.push(`#IF`); L.push(`true`); L.push(`#ACT`);
+  L.push(`SETSCTIMER 7 1`);
+  L.push(`SETSCTIMER 8 ${num('dataTimer')}`);
+  L.push(``, `;---- 随机延时上线，避免所有假人同秒出现 ----`);
+  L.push(`MOVR M81 2 20`);
+  L.push(`MUL M81 1000`);
+  L.push(`DELAYGOTO <$STR(M81)> @假人上线`);
+  L.push(`break`);
+  L.push(``);
+
+  /* --- 存放数据 --- */
+  if(chk('dataEnabled')){
+    L.push(`[@存放数据]`);
+    L.push(`;把假人当前状态写回 ini，引擎重启后可恢复`);
+    L.push(`#IF`); L.push(`true`); L.push(`#ACT`);
+    state.df.filter(f=>f.on!==false).forEach(f=>{
+      L.push(`WRITECONFIGFILEITEM ${p()}\\${val('dataFile')} <$USERNAME> ${f.k} <$STR(S$${f.k})>`);
+    });
+    L.push(``);
+  }
+
+  /* --- 老人启动 --- */
+  L.push(`[@老人启动]`);
+  L.push(`;读取全部历史数据并还原`);
+  L.push(`#IF`); L.push(`true`); L.push(`#ACT`);
+  if(chk('dataEnabled')){
+    state.df.filter(f=>f.on!==false).forEach(f=>{
+      L.push(`READCONFIGFILEITEM ${p()}\\${val('dataFile')} <$USERNAME> ${f.k} S$${f.k}`);
+    });
+  }
+  L.push(``);
+  L.push(`;---- 还原货币 ----`);
+  L.push(`#IF`); L.push(`true`); L.push(`#ACT`);
+  L.push(`GameGold + <$STR(S$元宝)>`);
+  L.push(`GAMEGIRD + <$STR(S$绑元)>`);
+  L.push(`GAMEDIAMOND + <$STR(S$积分)>`);
+  L.push(`give 金币 <$STR(S$金币)>`);
+  L.push(`break`);
+  L.push(``);
+  L.push(`;---- 还原等级经验 ----`);
+  L.push(`#if`); L.push(`NOT equal <$STR(S$等级)>`); L.push(`#act`);
+  L.push(`GMEXECUTE 等级 <$USERNAME> <$STR(S$等级)>`);
+  L.push(``);
+  L.push(`#if`); L.push(`NOT equal <$STR(S$经验)>`); L.push(`#act`);
+  L.push(`GMEXECUTE 经验 <$USERNAME> <$STR(S$经验)>`);
+  L.push(``);
+  L.push(`;---- 还原职业性别 ----`);
+  L.push(`#if`); L.push(`equal <$STR(S$职业)> 武士`); L.push(`#act`); L.push(`CHANGEJOB Warrior`); L.push(`break`); L.push(``);
+  L.push(`#if`); L.push(`equal <$STR(S$职业)> 魔法师`); L.push(`#act`); L.push(`CHANGEJOB Wizard`); L.push(`break`); L.push(``);
+  L.push(`#if`); L.push(`equal <$STR(S$职业)> 道士`); L.push(`#act`); L.push(`CHANGEJOB Taoist`); L.push(`break`); L.push(``);
+  L.push(`;---- 还原装备：先给再穿 ----`);
+  const eqMap={武器:1,衣服:0,头盔:4,项链:3,左手:5,右手:6,左戒:7,右戒:8,腰带:10,靴子:11,斗笠:13,勋章:2,圣心:9,血石:12};
+  Object.entries(eqMap).forEach(([k,pos])=>{
+    L.push(`#if`); L.push(`NOT equal <$STR(S$${k})>`); L.push(`#act`);
+    L.push(`give <$STR(S$${k})>`);
+    L.push(`takeon <$STR(S$${k})> ${pos}`);
+    L.push(`break`); L.push(``);
+  });
+  L.push(`;---- 还原技能 ----`);
+  for(let i=1;i<=9;i++){
+    L.push(`#if`); L.push(`NOT equal <$STR(S$技能${i})>`); L.push(`#act`);
+    L.push(`ADDSKILL <$STR(S$技能${i})> 3`);
+    L.push(`break`); L.push(``);
+  }
+  L.push(`;---- 还原完成后重新拉起定时器 ----`);
+  L.push(`#IF`); L.push(`true`); L.push(`#ACT`);
+  L.push(`SETSCTIMER 7 1`);
+  L.push(`SETSCTIMER 8 ${num('dataTimer')}`);
+  L.push(`break`);
+  L.push(``);
+
+  /* --- 假人上线 --- */
+  L.push(`[@假人上线]`);
+  L.push(`;按等级决定落在主城还是新手区`);
+  L.push(`#if`); L.push(`checklevelex < ${num('initLevel')}`); L.push(`#act`);
+  L.push(`DUMMYSTOP`);
+  L.push(`mapmove ${val('newbieMap')} 15 15 10`);
+  L.push(`SENDMSG 0 欢迎新人〖%s〗加入<$SERVERNAME>，祝您好运连连！`);
+  L.push(`break`);
+  L.push(``);
+  L.push(`#if`); L.push(`checklevelex > ${num('initLevel')-1}`); L.push(`#act`);
+  L.push(`DUMMYSTOP`);
+  L.push(`mapmove ${homeMap()} ${homeX()} ${homeY()} 9`);
+  L.push(`SENDMSG 0 ${val('msgWelcome').replace(/&lt;/g,'<').replace(/&gt;/g,'>')}`);
+  L.push(`DUMMYSTOP`);
+  L.push(`break`);
+  L.push(``);
+  L.push(`;====================================================`);
+  L.push(`; 定时器 7：全部功能（1 秒）`);
+  L.push(`; 定时器 8：下图打怪 + 存盘（${num('dataTimer')} 秒）`);
+  L.push(`;====================================================`);
+  L.push(``);
+
+  /* --- Timer7 --- */
+  L.push(`[@OnTimer7]`);
+  L.push(`#if`); L.push(`true`); L.push(`#act`);
+  timer7.forEach(t=>L.push(`goto ${t}`));
+  L.push(``);
+
+  /* --- Timer8 --- */
+  L.push(`[@OnTimer8]`);
+  L.push(`#if`); L.push(`true`); L.push(`#act`);
+  timer8.forEach(t=>L.push(`goto ${t}`));
+  if(chk('dataEnabled')) L.push(`#CALL [\\${pack()}\\1假人启动初始化.txt] @存放数据`);
+  L.push(``);
+
+  /* --- 各功能段落 --- */
+  const P=[];   // 附加段落
+
+  if(mod('mLevel')){
+    timer7.push('@假人自动升级');
+    P.push(`[@假人自动升级]`);
+    P.push(`;每 1 秒加经验。加 NOT ISONMAP 可排除特定地图（如新开区等待）`);
+    P.push(`#IF`);
+    P.push(`true`);
+    P.push(`#ACT`);
+    P.push(`ChangeExp + ${num('autoExp')}`);
+    P.push(``);
+  }
+  if(mod('mHp')){
+    timer7.push('@假人自动回血');
+    P.push(`[@假人自动回血]`);
+    P.push(`#IF`); P.push(`TRUE`); P.push(`#ACT`);
+    P.push(`HUMANHP + ${num('autoHp')} 0`);
+    P.push(`HUMANMP + ${num('autoHp')} 0`);
+    P.push(``);
+  }
+  if(mod('mProtect')){
+    timer7.push('@假人保护设置');
+    P.push(`[@假人保护设置]`);
+    P.push(`;血量低于最大血量的 ${num('protectPct')}% 时随机传送或回城`);
+    P.push(`#IF`); P.push(`true`); P.push(`#ACT`);
+    P.push(`CALCPERCENT <$MAXHP> ${num('protectPct')} N87`);
+    P.push(`#IF`); P.push(`small <$HP> <$STR(N87)>`); P.push(`random 5`); P.push(`#ACT`);
+    P.push(`mapmove <$CURRENTMAP>`);
+    P.push(`break`);
+    P.push(`#IF`); P.push(`small <$HP> <$STR(N87)>`); P.push(`random 5`); P.push(`#ACT`);
+    P.push(`DUMMYSTOP`);
+    P.push(`goto @假人回城`);
+    P.push(`break`);
+    P.push(``);
+  }
+  if(mod('mRandom')){
+    timer7.push('@假人无怪随机');
+    P.push(`[@假人无怪随机]`);
+    P.push(`;在指定地图（默认主城）待够时间就飞随机，避免堆在安全区`);
+    P.push(`#IF`); P.push(`ISONMAP ${homeMap()}`); P.push(`random 20`); P.push(`#ACT`);
+    P.push(`mapmove <$CURRENTMAP>`);
+    P.push(`break`);
+    P.push(``);
+  }
+  if(mod('mRecycle')){
+    timer7.push('@假人自动回收');
+    P.push(`[@假人自动回收]`);
+    P.push(`;回收身上的指定装备换取元宝，物品名按 | 分隔`);
+    P.push(`#IF`); P.push(`random 50`); P.push(`#ACT`);
+    P.push(`TAKEBAGITEM 圣战头盔|圣战手镯|圣战戒指|圣战项链 100 20 0 0 0 N5 1`);
+    P.push(`#IF`); P.push(`large N5 0`); P.push(`#ACT`);
+    P.push(`MOV N6 <$STR(N5)>`);
+    P.push(`MUL N6 20`);
+    P.push(`SENDMSG 0 玩家[%s]回收<$STR(N5)>件装备获得元宝*<$STR(N6)>`);
+    P.push(``);
+  }
+  if(mod('mPay')){
+    timer7.push('@假人自动充值');
+    P.push(`[@假人自动充值]`);
+    P.push(`;档位文件格式：数额<空格>权重（权重越大越难抽到）`);
+    P.push(`#IF`); P.push(`random 8000`); P.push(`#ACT`);
+    P.push(`READRANDOMSTR .\\${p()}\\假人充值随机金额设置.txt S15`);
+    P.push(`MUL N15 200`);
+    P.push(`GAMEGOLD + <$STR(N15)>`);
+    P.push(`SENDMSG 1  ★[%s]:恭喜<$USERNAME>成功充值<$STR(N15)>元宝，如果您也想获得，请赶快充值吧。`);
+    P.push(`break`);
+    P.push(``);
+  }
+  if(mod('mShout')){
+    timer7.push('@假人自动喊话');
+    P.push(`[@假人自动喊话]`);
+    P.push(`;扣元宝换全服喊话，文本需自行准备`);
+    P.push(`#IF`); P.push(`CHECKGAMEGOLD > 19`); P.push(`random 5000`); P.push(`#ACT`);
+    P.push(`ReadRandomLine .\\${p()}\\假人说话文本\\假人喊话语句.txt S16`);
+    P.push(`GAMEGOLD - 20`);
+    P.push(`SENDMSG 0 【%s】：<$STR(S16)> 255 245`);
+    P.push(`SENDMSG 0 【注：以上信息为玩家〖%s〗所发，请注意核实内容真实性，防止上当受骗】 170 255`);
+    P.push(`break`);
+    P.push(``);
+  }
+  if(mod('mGuild')){
+    timer7.push('@假人自动创会');
+    P.push(`[@假人自动创会]`);
+    P.push(`;随机取行会名建会，G 变量控制上限，已建的写入名单避免重复`);
+    P.push(`#if`); P.push(`random 300`); P.push(`NOT HAVEGUILD`); P.push(`#ACT`);
+    P.push(`ReadRandomLine .\\${p()}\\假人行会名单.txt S35`);
+    P.push(`goto @假人自动创会a`);
+    P.push(`BREAK`);
+    P.push(``);
+    P.push(`[@假人自动创会a]`);
+    P.push(`#if`);
+    P.push(`NOT CHECKSTRINGLIST ${p()}\\已创行会名单.txt <$STR(S35)>`);
+    P.push(`small G9 ${num('guildMax')}`);
+    P.push(`#act`);
+    P.push(`AddGuild <$STR(S35)>`);
+    P.push(`INC G9 1`);
+    P.push(`ADDLINELIST ${p()}\\已创行会名单.txt <$STR(S35)>`);
+    P.push(`BREAK`);
+    P.push(``);
+    P.push(`[@假人自动入会]`);
+    P.push(`;没行会的假人随机加入已创建的行会`);
+    P.push(`#if`); P.push(`random 6000`); P.push(`NOT HAVEGUILD`); P.push(`#ACT`);
+    P.push(`ReadRandomLine .\\${p()}\\已创行会名单.txt S35`);
+    P.push(`AFFILIATEGUILD <$STR(S35)>`);
+    P.push(`BREAK`);
+    P.push(``);
+  }
+  if(mod('mDonate')){
+    timer7.push('@假人自动捐献');
+    P.push(`[@假人自动捐献]`);
+    P.push(`;按你的捐献脚本条件改写此处`);
+    P.push(`#IF`); P.push(`random 1000`); P.push(`#ACT`);
+    P.push(`SENDMSG 0 玩家[%s]捐献了行会金币，感谢您的支持！`);
+    P.push(`break`);
+    P.push(``);
+  }
+  if(mod('mRun')){
+    timer7.push('@假人主城跑动');
+    P.push(`[@假人主城跑动]`);
+    P.push(`;在主城随机走位，让假人看起来在活动`);
+    P.push(`#IF`); P.push(`random 20`); P.push(`#ACT`);
+    P.push(`GOTONOW ${homeX()} ${homeY()} 30`);
+    P.push(`break`);
+    P.push(``);
+  }
+  if(mod('mStrength')){
+    timer7.push('@假人强化装备元素');
+    P.push(`[@假人强化装备元素]`);
+    P.push(`;装备元素编号表见 装备元素配套文本.txt（8暴击 16防爆 18增伤等）`);
+    P.push(`#if`); P.push(`equal <$HELMET> 雷泽战盔`); P.push(`#act`);
+    P.push(`mov N55 3`); P.push(`mov S55 <$HELMET>`);
+    P.push(`goto @假人强化装备元素a`); P.push(`break`);
+    P.push(``);
+    P.push(`[@假人强化装备元素a]`);
+    P.push(`;此处调用你的元素强化脚本`);
+    P.push(`#IF`); P.push(`true`); P.push(`#ACT`);
+    P.push(`SENDMSG 0 强化<$STR(S55)>`);
+    P.push(`break`);
+    P.push(``);
+  }
+  if(mod('mRage')){
+    timer7.push('@假人自动开狂暴');
+    P.push(`[@假人自动开狂暴]`);
+    P.push(`#IF`); P.push(`random 30`); P.push(`#ACT`);
+    P.push(`CHANGEMODE 1 1`);
+    P.push(`break`);
+    P.push(``);
+  }
+  if(mod('mCurrency')){
+    timer7.push('@假人自动吃货币');
+    P.push(`[@假人自动吃货币]`);
+    P.push(`#IF`); P.push(`random 50`); P.push(`#ACT`);
+    P.push(`;GIVE 金币 10000`);
+    P.push(`break`);
+    P.push(``);
+  }
+  if(mod('mAutoEq')){
+    timer7.push('@假人自动穿戴');
+    P.push(`[@假人自动穿戴]`);
+    P.push(`;按等级补齐基础装备（只给缺的，不覆盖更好的）`);
+    P.push(`#IF`); P.push(`checklevelex = ${num('initLevel')}`); P.push(`#ACT`);
+    P.push(`give 布衣 1`);
+    P.push(`give 木剑 1`);
+    P.push(`takeon 布衣 0`);
+    P.push(`takeon 木剑 1`);
+    P.push(`break`);
+    P.push(``);
+  }
+  if(mod('mFight')&&chk('fightEnabled')&&state.maps.length){
+    timer8.push('@假人自动下图打怪');
+    P.push(`[@假人自动下图打怪]`);
+    P.push(`;按等级 + 单图人数上限分流，避免全挤一张图`);
+    state.maps.forEach(m=>{
+      P.push(`#if`);
+      P.push(m.min>0?`CHECKLEVELEX > ${m.min-1}`:`CHECKLEVELEX >= ${m.min}`);
+      P.push(`random ${num('fightRnd')}`);
+      P.push(`CHECKMAPHUMANCOUNT ${m.map} < ${m.max||30} 2`);
+      P.push(`#act`);
+      P.push(`mapmove ${m.map}`);
+      P.push(`DUMMYSTART`);
+      P.push(`SENDMSG 0 玩家[%s]，${m.tip||'进入地图，祝您收获满满！'}`);
+      P.push(`break`);
+      P.push(``);
+    });
+    P.push(`[@假人打怪回城]`);
+    P.push(`;random 值越大，在地图停留越久`);
+    P.push(`#if`); P.push(`random ${num('fightStay')}`); P.push(`#ACT`);
+    P.push(`DUMMYSTOP`);
+    P.push(`goto @假人回城`);
+    P.push(`break`);
+    P.push(``);
+  }
+  if(mod('mSiege')&&chk('siegeEnabled')){
+    timer7.push('@假人自动攻城');
+    P.push(`[@假人自动攻城]`);
+    P.push(`;攻城时段 + 有行会 + 在主城安全区 → 随机飞进攻点`);
+    P.push(`#if`);
+    P.push(`ISONCASTLEWAR`);
+    P.push(`HAVEGUILD`);
+    P.push(`ISONMAP ${homeMap()}`);
+    P.push(`INSAFEZONE`);
+    P.push(`random ${num('siegeRnd')}`);
+    P.push(`#act`);
+    P.push(`CHANGEATTACKMODE 5`);
+    P.push(`goto @假人自动攻城A`);
+    P.push(`break`);
+    P.push(``);
+    P.push(`[@假人自动攻城A]`);
+    P.push(`;攻沙期间血蓝拉满，避免半路被打死`);
+    P.push(`#if`); P.push(`true`); P.push(`#ACT`);
+    P.push(`HUMANHP + 1000000000`);
+    P.push(`HUMANMP + 1000000000`);
+    state.siege.forEach((s,i)=>{
+      P.push(`#if`); P.push(`random ${s.p||10}`); P.push(`#act`);
+      P.push(s.r ? `MAPMOVE ${s.map} ${s.x} ${s.y} ${s.r}` : `MAPMOVE ${s.map}`);
+      P.push(`DUMMYSTART`);
+      P.push(`break`);
+      P.push(``);
+    });
+    if(chk('siegeDefend')){
+      P.push(`[@假人攻守互换]`);
+      P.push(`;转为守城方就停手，避免假人打自家城堡`);
+      P.push(`#if`); P.push(`ISDUMMY`); P.push(`ISDEFENSEGUILD`); P.push(`#ACT`);
+      P.push(`DUMMYSTOP`);
+      P.push(`break`);
+      P.push(``);
+    }
+    if(chk('siegeReward')){
+      P.push(`[@假人领取沙巴克奖励]`);
+      P.push(`;按你版本的领奖条件改写`);
+      P.push(`#IF`); P.push(`ISCASTLEMASTER`); P.push(`equal G10 1`); P.push(`#ACT`);
+      P.push(`MOV G10 0`);
+      P.push(`GAMEGOLD + 66666`);
+      P.push(`SENDMSG 0 恭喜沙老大[%s]领取攻城奖励：【66666元宝】！`);
+      P.push(`break`);
+      P.push(``);
+    }
+  }
+  if(mod('mAct')&&chk('actEnabled')&&state.acts.length){
+    timer7.push('@假人自动参加活动');
+    P.push(`[@假人自动参加活动]`);
+    P.push(`;开关变量由你的机器人活动脚本写入：${val('actVar')}=${val('actOn')}`);
+    P.push(`;活动开始 → 进场；活动结束 → 回城`);
+    P.push(`#IF`);
+    P.push(`EQUAL ${val('actVar')} ${val('actOn')}`);
+    P.push(`NOT ISONMAP ${state.acts[0].map}`);
+    P.push(`#ACT`);
+    P.push(`goto @假人活动1`);
+    P.push(`BREAK`);
+    P.push(``);
+    P.push(`#IF`);
+    P.push(`EQUAL ${val('actVar')} ${val('actOff')}`);
+    P.push(`ISONMAP ${state.acts[0].map}`);
+    P.push(`#ACT`);
+    P.push(`DUMMYSTOP`);
+    P.push(`mapmove ${homeMap()}`);
+    P.push(`goto @假人回城`);
+    P.push(`BREAK`);
+    P.push(``);
+    state.acts.forEach((a,i)=>{
+      P.push(`[@假人活动${i+1}]`);
+      P.push(`;${a.name}：人数少于 ${a.max} 才进场，避免太假`);
+      P.push(`#IF`);
+      P.push(`random ${a.rnd||20}`);
+      P.push(`CHECKMAPHUMANCOUNT ${a.map} < ${a.max||50}`);
+      P.push(`NOT ISONMAP ${a.map}`);
+      P.push(`#ACT`);
+      P.push(`mapmove ${a.map}`);
+      P.push(`CHANGEATTACKMODE 5`);
+      if(a.mode.startsWith('主动')) P.push(`DUMMYSTART`); else P.push(`DUMMYSTOP`);
+      P.push(`SENDMSG 0 玩家【%s】参加${a.name}活动，请大家尽快参与... 253 255`);
+      P.push(`BREAK`);
+      P.push(``);
+    });
+  }
+
+  /* --- 回城段 --- */
+  P.push(`[@假人回城]`);
+  P.push(`;注意：0222 引擎切图后 GOTONOW 会失效，所以先走 1 格再回主城`);
+  P.push(`#IF`); P.push(`true`); P.push(`#ACT`);
+  P.push(`DUMMYSTOP`);
+  P.push(`GOTONOW 15 14 1`);
+  P.push(`DELAYGOTO 2000 @假人回城a`);
+  P.push(`break`);
+  P.push(``);
+  P.push(`[@假人回城a]`);
+  P.push(`#IF`); P.push(`true`); P.push(`#ACT`);
+  P.push(`mapmove ${homeMap()} ${homeX()} ${homeY()} 8`);
+  P.push(`break`);
+  P.push(``);
+  P.push(`[@假人回收]`);
+  P.push(`;管理员手动回收所有假人`);
+  P.push(`#IF`); P.push(`ISDUMMY`); P.push(`#ACT`);
+  P.push(`DUMMYSTOP`);
+  P.push(`mapmove ${val('newbieMap')} 15 15 5`);
+  P.push(`break`);
+
+  return {name:'③ 1假人启动初始化.txt（主脚本）',
+    path:`Envir/QuestDiary/${pack()}/1假人启动初始化.txt`,
+    text:L.concat(P).join('\n')};
+}
+
+/* ---------- 文件 4：拾取穿装备 ---------- */
+function genPick(){
+  if(!chk('pickEnabled'))return null;
+  const L=[], A=[];
+  L.push(`;====================================================`);
+  L.push(`;  ${pack()} · 拾取与智能换装`);
+  L.push(`;  落盘：Mir200\\Envir\\QuestDiary\\${pack()}\\拾取穿装备.txt`);
+  L.push(`;  由 QF 的 [@PickUpItem] 调用：#CALL [\\${pack()}\\拾取穿装备.txt] @开始检测`);
+  L.push(`;====================================================`);
+  L.push(``);
+  L.push(`[@开始检测]`);
+  L.push(`;按职业设定属性计算字段（不同职业 JPDC/JPMC/JPSC）`);
+  L.push(`#IF`); L.push(`CHECKJOB warrior`); L.push(`#ACT`);
+  L.push(`MOV S111 JPDC`); L.push(`break`); L.push(``);
+  L.push(`#IF`); L.push(`CHECKJOB wizard`); L.push(`#ACT`);
+  L.push(`MOV S111 JPMC`); L.push(`break`); L.push(``);
+  L.push(`#IF`); L.push(`CHECKJOB taoist`); L.push(`#ACT`);
+  L.push(`MOV S111 JPSC`); L.push(`goto @判断装备位置`); L.push(`break`);
+  L.push(``);
+  L.push(`[@判断装备位置]`);
+  L.push(`;按 StdMode 分流到各部位。只列出「拾取与智能换装」中已勾选的部位，`);
+  L.push(`;补新部位时在那里加一行即可，这里会自动补上分流。`);
+  const STD2TAG={15:'头盔更换','19':'项链更换','20':'项链更换','21':'项链更换',
+    '22':'戒指更换','23':'戒指更换','24':'手镯更换','26':'手镯更换',
+    '27':'腰带更换','28':'靴子更换','5':'武器更换','6':'武器更换',
+    '10':'衣服更换','11':'衣服更换','16':'斗笠更换','30':'勋章更换'};
+  const activeTags=new Set(state.slots.map(s=>s.name.replace(/^@/,'').replace(/更换$/,'')+'更换'));
+  const groups=[];   // 相同标签的 StdMode 合并（用 #OR）
+  Object.entries(STD2TAG).forEach(([sm,tag])=>{
+    let g=groups.find(x=>x.tag===tag);
+    if(!g){g={tag,sms:[]};groups.push(g)}
+    g.sms.push(sm);
+  });
+  groups.forEach(g=>{
+    if(!activeTags.has(g.tag))return;// 未勾选的部位不输出分流
+    g.sms.forEach((sm,i)=>{
+      // 每组独立起一个 #IF，组内后续条件用 #OR
+      L.push(i===0?'#IF':'#OR');
+      L.push(`equal <$CURRTEMSTDMODE> ${sm}`);
+    });
+    L.push(`#ACT`);
+    L.push(`goto @${g.tag}`);
+    L.push(``);
+  });
+  L.push(`;其他 StdMode 不处理`);
+  L.push(``);
+
+  const attr3 = val('pickAttr')==='3';
+  state.slots.forEach(s=>{
+    const slot=SLOTS.find(x=>x.pos==s.pos)||s;
+    const label=s.name.replace(/^@/,'').replace(/更换$/,'');
+    A.push(`[@${label}更换]`);
+    A.push(`;① 身上没这件 → 直接穿`);
+    A.push(`#IF`);
+    A.push(`NOT CHECKUSEITEM ${s.pos}`);
+    A.push(`#act`);
+    A.push(`TAKEON <$CURRTEMNAME> ${s.pos}`);
+    A.push(`BREAK`);
+    A.push(``);
+    A.push(`;② 已穿戴 → 取双方总属性对比，更优才换`);
+    A.push(`#IF`);
+    A.push(`CHECKUSEITEM ${s.pos}`);
+    A.push(`#act`);
+    A.push(`;拾取物总属性（附加 + DB）`);
+    A.push(`GETITEMFIELDVALUE P <$STR(S111)> N81`);
+    A.push(`GETITEMFIELDVALUE ${s.pos} <$STR(S111)> N82`);
+    A.push(`GetDBItemFieldValue <$CURRTEMNAME> DC2 N83`);
+    A.push(`GetDBItemFieldValue ${s.var} DC2 N84`);
+    A.push(`INC N81 <$STR(N83)>`);
+    A.push(`INC N82 <$STR(N84)>`);
+    if(attr3){
+      A.push(`;防御 + 魔防叠加`);
+      A.push(`GETITEMFIELDVALUE P JPAC N85`);
+      A.push(`GETITEMFIELDVALUE ${s.pos} JPAC N86`);
+      A.push(`GetDBItemFieldValue <$CURRTEMNAME> AC2 N87`);
+      A.push(`GetDBItemFieldValue ${s.var} AC2 N88`);
+      A.push(`INC N85 <$STR(N87)>`);
+      A.push(`INC N86 <$STR(N88)>`);
+      A.push(`GETITEMFIELDVALUE P JPMAC N89`);
+      A.push(`GETITEMFIELDVALUE ${s.pos} JPMAC N90`);
+      A.push(`GetDBItemFieldValue <$CURRTEMNAME> MAC2 N91`);
+      A.push(`GetDBItemFieldValue ${s.var} MAC2 N92`);
+      A.push(`INC N89 <$STR(N91)>`);
+      A.push(`INC N90 <$STR(N92)>`);
+      A.push(`;攻防合并成单一维度对比`);
+      A.push(`INC N85 <$STR(N89)>`);
+      A.push(`INC N86 <$STR(N90)>`);
+      A.push(`INC N85 <$STR(N81)>`);
+      A.push(`INC N86 <$STR(N82)>`);
+      A.push(``);
+      A.push(`;攻击更高 → 换`);
+      A.push(`#IF`);
+      A.push(`large N81 <$STR(N82)>`);
+      A.push(`#ACT`);
+      A.push(`TAKEON <$CURRTEMNAME> ${s.pos}`);
+      A.push(`BREAK`);
+      A.push(`;攻防相当时，防御更高 → 换`);
+      A.push(`#IF`);
+      A.push(`EQUAL N81 <$STR(N82)>`);
+      A.push(`large N85 <$STR(N86)>`);
+      A.push(`#ACT`);
+      A.push(`TAKEON <$CURRTEMNAME> ${s.pos}`);
+      A.push(`BREAK`);
+    }else{
+      A.push(`;仅按攻防对比（复古服）`);
+      A.push(`#IF`);
+      A.push(`large N81 <$STR(N82)>`);
+      A.push(`#ACT`);
+      A.push(`TAKEON <$CURRTEMNAME> ${s.pos}`);
+      A.push(`BREAK`);
+    }
+    A.push(``);
+  });
+
+  A.push(`[@配置预处理]`);
+  A.push(`;主脚本启动时调用，用于设置拾取名单`);
+  A.push(`#IF`); A.push(`true`); A.push(`#ACT`);
+  A.push(`;AUTOPICKUPITEM 需要绝对路径，例如：`);
+  A.push(`;AUTOPICKUPITEM C:\\MirServer\\Mir200\\Envir\\QuestDiary\\${pack()}\\${val('pickFile')} ${num('pickLv')} 0 1`);
+  A.push(`break`);
+
+  return {name:'④ 拾取穿装备.txt（属性对比换装）',
+    path:`Envir/QuestDiary/${pack()}/拾取穿装备.txt`,
+    text:L.concat(A).join('\n')};
+}
+
+/* ---------- 文件 5：QFunction-0 ---------- */
+function genQF(){
+  if(!chk('qfEnabled'))return null;
+  const L=[];
+  L.push(`;====================================================`);
+  L.push(`;  ${pack()} · QFunction 联动段落`);
+  L.push(`;  落盘：Mir200\\Envir\\QFunction-0.txt（追加，不要覆盖原文件）`);
+  L.push(`;====================================================`);
+  L.push(``);
+  L.push(`[@PickUpItem]`);
+  L.push(`;拾取时联动换装`);
+  L.push(`#IF`);
+  L.push(`true`);
+  L.push(`#ACT`);
+  if(chk('pickEnabled')) L.push(`#CALL [\\${pack()}\\拾取穿装备.txt] @开始检测`);
+  L.push(``);
+  L.push(`[@PlayDie]`);
+  L.push(`;死亡后随机延时复活，避免同秒复活集中出现`);
+  L.push(`#If`);
+  L.push(`KillByHum`);
+  L.push(`#Act`);
+  L.push(`MOVR N55 2 5`);
+  L.push(`MUL N55 1000`);
+  L.push(`DELAYGOTO <$STR(N55)> @假人复活`);
+  L.push(`break`);
+  L.push(`#If`);
+  L.push(`true`);
+  L.push(`#Act`);
+  L.push(`MOVR N55 2 5`);
+  L.push(`MUL N55 1000`);
+  L.push(`DELAYGOTO <$STR(N55)> @假人复活`);
+  L.push(`break`);
+  L.push(``);
+  L.push(`[@假人复活]`);
+  L.push(`#If`);
+  L.push(`ISDUMMY`);
+  L.push(`#Act`);
+  L.push(`GMEXECUTE 复活 <$USERNAME>`);
+  L.push(`SETSCTIMER 7 1`);
+  L.push(`SETSCTIMER 8 ${num('dataTimer')}`);
+  L.push(`DUMMYSTOP`);
+  L.push(`mapmove ${val('newbieMap')} 15 15 5`);
+  L.push(`GOTONOW 15 14 1`);
+  L.push(`DELAYGOTO ${num('qfRevive')} @假人复活A`);
+  L.push(`break`);
+  L.push(``);
+  L.push(`[@假人复活A]`);
+  L.push(`#IF`);
+  L.push(`true`);
+  L.push(`#ACT`);
+  L.push(`mapmove ${homeMap()} ${homeX()} ${homeY()} 8`);
+  L.push(`SENDMSG 0 ${val('msgWelcome').replace(/&lt;/g,'<').replace(/&gt;/g,'>')}`);
+  L.push(`break`);
+  L.push(``);
+  L.push(`[@PlayLevelUp]`);
+  L.push(`;升级时随机变性 + 随机转职 + 拉起定时器`);
+  L.push(`#IF`);
+  L.push(`ISDUMMY`);
+  L.push(`#ACT`);
+  L.push(`SETSCTIMER 7 1`);
+  L.push(`MOVR M81 10 3600`);
+  L.push(`MUL M81 1000`);
+  L.push(`DELAYGOTO <$STR(M81)> @假人数据保存`);
+  if(num('qfGenderLv')>0){
+    L.push(``);
+    L.push(`;随机变性：到指定等级时改性别`);
+    L.push(`#IF`);
+    L.push(`gender MAN`);
+    L.push(`CHECKLEVELEX = ${num('qfGenderLv')}`);
+    L.push(`random 2`);
+    L.push(`#ACT`);
+    L.push(`CHANGEGENDER 1`);
+  }
+  if(chk('dataEnabled')&&num('qfSkillLv')>0){
+    L.push(``);
+    L.push(`[@假人数据保存]`);
+    L.push(`;等级达标后写盘存盘`);
+    L.push(`#IF`);
+    L.push(`CHECKLEVELEX > ${num('qfSkillLv')}`);
+    L.push(`#ACT`);
+    L.push(`#CALL [\\${pack()}\\1假人启动初始化.txt] @存放数据`);
+  }
+  if(chk('qfTaunt')){
+    L.push(``);
+    L.push(`[@Struck]`);
+    L.push(`;被打时随机骂街（拟人化）`);
+    L.push(`#IF`);
+    L.push(`ISDUMMY`);
+    L.push(`random 200`);
+    L.push(`CHECKCURRTARGETRACE = 1`);
+    L.push(`#ACT`);
+    L.push(`MOVR N66 10 60`);
+    L.push(`DELAYCALL <$STR(N66)> @骂人`);
+    L.push(`break`);
+    L.push(``);
+    L.push(`[@Attack]`);
+    L.push(`;主动攻击时随机骂街`);
+    L.push(`#IF`);
+    L.push(`ISDUMMY`);
+    L.push(`random 200`);
+    L.push(`CHECKCURRTARGETRACE = 1`);
+    L.push(`#ACT`);
+    L.push(`MOVR N66 10 60`);
+    L.push(`DELAYCALL <$STR(N66)> @骂人`);
+    L.push(`break`);
+    L.push(``);
+    L.push(`[@骂人]`);
+    L.push(`#IF`);
+    L.push(`ISDUMMY`);
+    L.push(`#ACT`);
+    L.push(`ReadRandomLine ..\\${pack()}\\假人说话文本\\假人被打回话语句.txt S13`);
+    L.push(`SENDMSG 0 【%s】：<$STR(S13)> 255 245`);
+    L.push(`break`);
+  }
+  return {name:'⑤ QFunction-0.txt（联动段落，追加）',
+    path:'Envir/QFunction-0.txt', text:L.join('\n')};
+}
+
+/* ---------- 文件 6：QManage（QM）· 假人初始化入口 ---------- */
+function genQM(){
+  if(!chk('qmEnabled'))return null;
+  const L=[];
+  L.push(`;====================================================`);
+  L.push(`;  ${pack()} · QManage 段落`);
+  L.push(`;  落盘：Mir200\\Envir\\MapQuest_def\\QManage.txt（追加，不要覆盖原文件）`);
+  L.push(`;  作用：玩家/假人登录时自动调用 [@假人启动初始化]，`);
+  L.push(`;        并用全局变量做一次性守卫，避免每次登录都重跑初始化`);
+  L.push(`;====================================================`);
+  L.push(``);
+  L.push(`[@Login]`);
+  L.push(`;---- 玩家登录：仅对假人生效，进入初始化 ----`);
+  L.push(`#IF`);
+  L.push(`ISDUMMY`);
+  L.push(`CHECK [900] <> 1`);
+  L.push(`#ACT`);
+  L.push(`SET [900] 1`);
+  L.push(`#CALL [\\${pack()}\\1假人启动初始化.txt] @假人启动初始化`);
+  L.push(`#IF`);
+  L.push(`ISDUMMY`);
+  L.push(`equal [900] 1`);
+  L.push(`#ACT`);
+  L.push(`;已初始化过，跳过（防止重复穿戴/重复读数据）`);
+  L.push(``);
+  L.push(`;---- 真人登录：把假人数据写盘（防止引擎重启后数据丢失） ----`);
+  L.push(`#IF`);
+  L.push(`NOT ISDUMMY`);
+  L.push(`#ACT`);
+  L.push(`MOV [900] 0`);
+  L.push(``);
+  L.push(`[@登出]`);
+  L.push(`;下线时清除守卫位，让假人下次登录能重新初始化`);
+  L.push(`#IF`);
+  L.push(`ISDUMMY`);
+  L.push(`#ACT`);
+  L.push(`MOV [900] 0`);
+  L.push(`break`);
+  L.push(``);
+  L.push(`[@定时巡检]`);
+  L.push(`;如需QM 侧周期巡检（可选），可把主脚本的巡检挂到这里`);
+  L.push(`#IF`);
+  L.push(`true`);
+  L.push(`#ACT`);
+  L.push(`;引擎周期调用，留空则不执行任何动作`);
+  L.push(`break`);
+  return {name:'⑥ QManage.txt（QM 登录触发，追加）',
+    path:'Envir/MapQuest_def/QManage.txt', text:L.join('\n')};
+}
+
+/* ---------- 文件 6：Dummys 配置 ---------- */
+function genDummyCfg(){
+  if(!chk('outDummyCfg'))return null;
+  return {name:'⑥ Dummys 假人配置模板（复制改名）',
+    path:'Envir/Dummys/<假人名>.txt（每个假人一份）',
+    text:`;==================== 假人配置 ====================
+;落盘：Mir200\\Envir\\Dummys\\<假人名字>.txt
+;每个假人一个文件，文件名 = AICharNameList.txt 里的名字
+;可批量复制本文件并改名
+[Info]
+Job=0
+Gender=0
+Hair=1
+Level=${num('initLevel')}
+Butch=0
+BodyLeathery=200
+DropUseItem=0
+DropUseItemRate=500
+UseAllSkillByJob=0
+UseSkill=基本剑术,攻杀剑术,刺杀剑术,半月弯刀,野蛮冲撞,烈火剑法
+InitItems=随机传送石
+PickUpItemMode=1
+PickUpItemTick=1000
+AttatckMode=2
+AIAttatckMode=3
+TargetCretHum=1
+AILastHiter=1
+AILastAttackTick=20
+UseJewelry=1
+UseGod=1
+
+[USEITEMS]
+USEITEMS0=
+USEITEMS1=
+USEITEMS2=
+USEITEMS3=
+USEITEMS4=
+USEITEMS5=
+USEITEMS6=
+USEITEMS7=
+USEITEMS8=
+USEITEMS9=
+USEITEMS10=
+USEITEMS11=
+USEITEMS12=
+USEITEMS13=`,
+  note:'每个假人一个文件，文件名须与 AICharNameList.txt 中的名字完全一致'};
+}
+
+/* ---------- 文件 7：配套数据（拆成独立文件，引擎按文件名读取） ---------- */
+const DATA_FILES=[
+  {file:'假人行会名单.txt', dir:'', head:';每行一个行会名，脚本用 ReadRandomLine 随机取用',
+   body:`征战天下
+妇女联盟
+散人俱乐部
+★中华☆英豪★
+风云☆天下
+豪门世家
+※纵横天下※
+义薄云天
+【狼图腾】
+☆兄弟★情深☆
+★流金岁月★
+『全民公敌』
+专治吹牛逼
+豪情世家
+雇佣军团
+★再续兄弟情★
+≠王者之家≠
+《散人部落》
+『兄弟联盟』
+※剑指※沙城※
+莽村大队
+兄弟情深
+〓暴力军团〓
+`},
+  {file:'假人充值随机金额设置.txt', dir:'', head:';格式：数额<空格>权重（权重越大，抽到的概率越小）\n;脚本用 READRANDOMSTR 随机读取',
+   body:`50	2
+100	10
+200	20
+300	50
+500	100
+1000	300
+1500	600
+2000	1000
+`},
+  {file:'装备元素配套文本.txt', dir:'', head:';编号|元素名，供强化脚本查表',
+   body:`8|暴击
+9|PK目标爆率
+16|防爆
+17|忽视目标防御
+18|增加伤害
+19|伤害反射
+20|物理伤害减少
+21|魔法伤害减少
+`},
+  {file:'假人捡取物品名字.txt', dir:'', head:';AUTOPICKUPITEM 使用的拾取白名单，一行一个物品名',
+   body:`命运之书
+基本剑术
+攻杀剑术
+刺杀剑术
+半月弯刀
+野蛮冲撞
+烈火剑法
+狮子吼
+开天斩
+火球术
+抗拒火环
+雷电术
+爆裂火焰
+疾光电影
+冰咆哮
+召唤骷髅
+召唤神兽
+随机传送石
+金币
+`},
+  {file:'假人喊话语句.txt', dir:'假人说话文本', head:';喊话文本，一行一句。脚本用 ReadRandomLine 读取',
+   body:`这地图真热闹啊
+兄弟一起组个队吧
+有人带boss吗
+求带赤月
+交易一下装备
+刷装备好累啊
+你们服务器挺热闹
+刚上线就被打爆了
+`},
+  {file:'假人被打回话语句.txt', dir:'假人说话文本', head:';被打后骂街文本，一行一句',
+   body:`就你话多
+打你怎么了
+别在这晃悠
+菜就多练
+你行你上
+别bb了
+`},
+];
+function genData(){
+  if(!chk('outGuild'))return null;
+  const text=DATA_FILES.map(d=>
+    `;========== ${d.file} ==========\n;${d.head}\n${d.body}`).join('\n');
+  return {name:'⑦ 配套数据（预览）', path:'', _data:true, text,
+    note:`落盘时拆成 ${DATA_FILES.length} 个独立文件`};
+}
+
+/* ---------- 文件 8：部署说明 ---------- */
+function genReadme(){
+  if(!chk('outReadme'))return null;
+  const n=state.maps.length, a=state.acts.length;
+  return {name:'⑧ 部署说明（照着做）', path:'— 部署说明 —',
+    text:`# ${pack()} · 部署说明
+
+## 一、生成的文件清单
+
+| # | 文件 | 落盘位置 | 是否必须 |
+|---|---|---|---|
+| 1 | RobotManage.txt | Mir200\\Envir\\Robot_def\\ | 必须 |
+| 2 | AutoRunRobot.txt | Mir200\\Envir\\Robot_def\\ | 必须 |
+| 3 | 1假人启动初始化.txt | Mir200\\Envir\\QuestDiary\\${pack()}\\ | 必须 |
+| 4 | 拾取穿装备.txt | Mir200\\Envir\\QuestDiary\\${pack()}\\ | 启用拾取时必须 |
+| 5 | QManage.txt | Mir200\\Envir\\MapQuest_def\\ | **追加，勿覆盖** |
+| 6 | QFunction-0.txt | Mir200\\Envir\\QFunction-0.txt | **追加，勿覆盖** |
+| 7 | Dummys\\*.txt | Mir200\\Envir\\Dummys\\ | 每个假人一个 |
+| 8 | 配套数据文件 | Mir200\\Envir\\QuestDiary\\${pack()}\\ | 视功能 |
+
+## 二、假人初始化（在 QM 中调用 · 你的需求）
+
+生成的文件 6 会写入 \`MapQuest_def\\QManage.txt\`，核心是 \`[@Login]\` 段：
+
+\`\`\`text
+[@Login]
+#IF
+ISDUMMY
+CHECK [900] <> 1
+#ACT
+SET [900] 1
+#CALL [\\${pack()}\\1假人启动初始化.txt] @假人启动初始化
+\`\`\`
+
+原理：假人登录 → 判定 \`ISDUMMY\` → 检查守卫标识 \`[900]\` 未被占用 →
+调用主脚本的 \`[@假人启动初始化]\`（读档/穿装备/开定时器）→ 置位 \`[900]\` 防止重复执行。
+
+**若你的QManage.txt 已有 [@Login] 段**：把上面这段合并进去，不要新建重复段落。
+**若你希望每次登录都重跑初始化**：删掉 \`CHECK [900] <> 1\` 与 \`SET [900] 1\` 两行即可。
+
+## 三、上线流程（重要）
+
+假人**不会自己上线**，必须走这条链路：
+
+1. \`Envir\\AICharNameList.txt\` 每行一个假人名字，数量 ≥ 你要上线的数量
+2. \`Envir\\Dummys\\\` 下为**每个名字**建一个同名 .txt 配置
+3. \`Robot_def\\AutoRunRobot.txt\` 写 \`#AutoRun NPC ${num('rbSec')} @假人上线\`
+4. \`Robot_def\\RobotManage.txt\` 放生成的上线逻辑（已含）
+5. M2 启动后机器人自动循环，每次上线 ${num('rbPer')} 个
+6. 假人登录时由 QManage 的 \`[@Login]\` 自动触发初始化（见上一节）
+
+> 若假人不上线：检查 ${val('rbVar')||'G88'} 变量是否已达上限 ${num('maxOld')}，
+> 重置该变量即可。
+
+## 四、当前配置摘要
+
+| 项 | 值 |
+|---|---|
+| 脚本套名 | ${pack()} |
+| 主城 | ${homeMap()} (${homeX()},${homeY()}) |
+| 新人地图 | ${val('newbieMap')} 上限 ${num('maxNewbie')} 人 |
+| 老区上限 | ${num('maxOld')} 人 |
+| 上线间隔 | ${num('rbSec')} 秒 × ${num('rbPer')} 个 |
+| 启用功能 | ${MODULES.filter(m=>state.mods[m.id]).map(m=>m.label).join('、')||'无'} |
+| 打怪地图 | ${n} 张 |
+| 活动 | ${a} 个 |
+| 攻沙 | ${chk('siegeEnabled')?'启用':'未启用'} |
+| 数据持久化 | ${chk('dataEnabled')?`开启（${num('dataLevel')} 级+每 ${num('dataTimer')} 秒）`:'关闭'} |
+
+## 五、真实脚本里的关键经验（务必阅读）
+
+1. **一个 [@段落] 只能有一个 #ACT**。功能多就拆成多个段落，用 goto 串起来。
+2. **回城要走两步**：0222 引擎切图后 GOTONOW 会失效，先 \`GOTONOW 15 14 1\` 再 \`mapmove 主城\`，否则假人会在土城乱跑。
+3. **假人不要一次全上线**：用 \`#AutoRun\` + 变量计数每次上 1 个，配合 \`MOVR\`+\`DELAYGOTO\` 随机延时，看起来像陆续登录。
+4. **同类型技能别学太多**：假人学会的技能都会随机放，实战很像真人操作。
+5. **数据必须持久化**：不写 ini 的话引擎重启后假人全部变新人，一眼假。
+6. **假人是"人物"不是"怪物"**：所有人物命令都生效（加入行会、拜师、学技能…），这正是拟人化的基础。
+
+生成时间：${new Date().toLocaleString('zh-CN')}
+`};
+}
+
+/* ---------- 汇总 ---------- */
+function buildAll(){
+  const out=[];
+  const add=f=>{if(f&&f.text&&f.text.trim())out.push(f)};
+  add(genRobot()); add(genAutoRun()); add(genMain()); add(genPick()); add(genQF()); add(genQM());
+  add(genDummyCfg()); add(genData()); add(genReadme());
+  return out;
+}
+
+/* ---------- 输出与高亮 ---------- */
+let TABS=[], CUR=0;
+function render(){
+  TABS=buildAll();
+  if(!TABS.length){TABS=[{name:'（无输出）',path:'',text:'所有模块均被关闭，请至少勾选一项。'}];}
+  CUR=0; drawTabs(); paint();
+  $('outInfo').textContent=TABS.length+' 个文件 · '+TABS.reduce((a,t)=>a+t.text.length,0)+' 字符';
+}
+function drawTabs(){
+  $('tabs').innerHTML=TABS.map((t,i)=>`<button class="${i===CUR?'on':''}" data-t="${i}" title="${t.path||''}">${t.name.split('（')[0]}</button>`).join('');
+  $('tabs').querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{CUR=+b.dataset.t;drawTabs();paint()});
+}
+function hl(s){
+  return s.split('\n').map(l=>{
+    let e=l.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    if(/^\s*\[@\S+\]/.test(e)) return '<span class="c">'+e+'</span>';
+    if(/^\s*#(IF|ACT|ELSEACT|OR|IFNOT)\b/i.test(e)) return '<span class="c">'+e+'</span>';
+    if(/^\s*;/.test(e)) return '<span class="m">'+e+'</span>';
+    e=e.replace(/(&lt;\$[A-Z0-9_.]+&gt;)/g,'<span class="s">$1</span>');
+    e=e.replace(/(&lt;\$STR\([^)]*\)&gt;)/g,'<span class="s">$1</span>');
+    e=e.replace(/(\$\([^)]+\))/g,'<span class="v">$1</span>');
+    e=e.replace(/^(\s*)([A-Z][A-Z0-9_]{2,})\b/,'$1<span class="k">$2</span>');
+    return e;
+  }).join('\n');
+}
+function paint(){
+  const t=TABS[CUR];
+  $('out').innerHTML=(t.path?`<span class="m">; 落盘 → ${t.path.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</span>\n`:'')+hl(t.text);
+}
+$('genBtn').onclick=render;
+
+/* ==========================================================================
+   一键落盘：File System Access API
+   ========================================================================== */
+let DIR_HANDLE=null;
+const HAS_FS='showDirectoryPicker' in window;
+
+function log(msg,kind){
+  const el=$('fsLog');
+  const color=kind==='ok'?'#1a7a4c':kind==='err'?'#a8342a':kind==='warn'?'#a8790a':'#5c6672';
+  const t=new Date().toLocaleTimeString('zh-CN',{hour12:false});
+  el.insertAdjacentHTML('beforeend',
+    `<div style="font:12.3px/1.75 Consolas,monospace;color:${color};border-left:2px solid ${color};padding-left:8px;margin-top:3px">
+      <span style="color:#8a919b">[${t}]</span> ${msg}</div>`);
+  el.scrollTop=el.scrollHeight;
+}
+function logClear(){ $('fsLog').innerHTML=''; }
+
+/* ---- GBK 编码（TextEncoder 只支持 UTF-8，引擎读 GBK 需自己转） ---- */
+let GBK_MAP=null;
+function gbkTable(){
+  if(GBK_MAP)return GBK_MAP;
+  GBK_MAP=new Map();
+  const dec=new TextDecoder('gbk');
+  // 遍历 GBK 全部双字节区，建立 unicode → gbk 字节映射
+  const bytes=[];
+  for(let hi=0x81;hi<=0xFE;hi++)for(let lo=0x41;lo<=0xFE;lo++){
+    if(lo===0x7F)continue;
+    bytes.push([hi,lo]);
+  }
+  const buf=new Uint8Array(bytes.length*2);
+  bytes.forEach(([hi,lo],i)=>{buf[i*2]=hi;buf[i*2+1]=lo});
+  try{
+    const s=dec.decode(buf);
+    for(let i=0;i<bytes.length;i++){
+      const ch=s[i];
+      if(ch&&ch!=='\uFFFD'&&!GBK_MAP.has(ch))
+        GBK_MAP.set(ch,[bytes[i][0],bytes[i][1]]);
+    }
+  }catch(e){ log('GBK 表构建失败，将退回 UTF-8：'+e.message,'err'); }
+  return GBK_MAP;
+}
+function encodeText(text,enc){
+  // 先统一为 CRLF（引擎脚本用 CRLF 最稳）
+  const body=text.replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/\n/g,'\r\n');
+  if(enc==='utf8')return new TextEncoder().encode(body);
+  if(enc==='utf8bom')return new TextEncoder().encode('\ufeff'+body);
+  // GBK：逐字查表，未收录字符退化为 '?'
+  const tbl=gbkTable();
+  const out=[];
+  for(let i=0;i<body.length;i++){
+    const c=body.charCodeAt(i);
+    if(c===13){ out.push(13); continue; }              // CR
+    if(c===10){ out.push(10); continue; }              // LF
+    if(c<0x80){ out.push(c); continue; }               // ASCII
+    const ch=body[i];
+    if(ch>='\uD800'&&ch<='\uDBFF'&&i+1<body.length){    // 代理对 → '?'
+      const b=tbl.get(ch); if(b){out.push(b[0],b[1])}else out.push(0x3F);
+      i++; continue;
+    }
+    const b=tbl.get(ch);
+    if(b){ out.push(b[0],b[1]); }
+    else { out.push(0x3F); }
+  }
+  return new Uint8Array(out);
+}
+
+/* ---- 递归创建目录并写文件 ---- */
+async function writeTo(dirHandle,relPath,data,mode){
+  const parts=relPath.split('/').filter(Boolean);
+  const fname=parts.pop();
+  let cur=dirHandle;
+  for(const seg of parts){
+    try{
+      cur=await cur.getDirectoryHandle(seg,{create:true});
+    }catch(err){
+      if(err&&err.name==='TypeMismatchError')
+        throw new Error(`路径冲突：「${relPath}」中的「${seg}」已存在但不是文件夹`);
+      throw err;
+    }
+  }
+  const fh=await cur.getFileHandle(fname,{create:true});
+  if(mode==='append'){
+    const old=await fh.getFile();
+    if(old.size>0){
+      const prev=new Uint8Array(await old.arrayBuffer());
+      // 末字节不是换行时补一个 CRLF（注意 size 可能只有 1 字节）
+      const tail=prev.length>=2?prev[prev.length-2]:prev[0];
+      const needSep=!(tail===0x0A||tail===0x0D);
+      const sepBytes=needSep?encodeText('\r\n','gbk'):new Uint8Array(0);
+      const merged=new Uint8Array(prev.length+sepBytes.length+data.length);
+      merged.set(prev,0);
+      merged.set(sepBytes,prev.length);
+      merged.set(data,prev.length+sepBytes.length);
+      const w=await fh.createWritable();
+      await w.write(merged); await w.close();
+      return {appended:true,size:old.size,added:data.length};
+    }
+  }
+  const w=await fh.createWritable();
+  await w.write(data); await w.close();
+  return {appended:false,size:data.length};
+}
+
+/* ---- 生成带目录结构的文件清单 ---- */
+function buildFileList(){
+  const list=[];
+  TABS.forEach(t=>{
+    if(t._data){
+      // 配套数据：拆成独立文件（含子目录）
+      DATA_FILES.forEach(d=>{
+        const base=`Envir/QuestDiary/${pack()}`;
+        const path=d.dir?`${base}/${d.dir}/${d.file}`:`${base}/${d.file}`;
+        list.push({path, text:d.head+'\n'+d.body, name:d.file, mode:'write'});
+      });
+      return;
+    }
+    if(!t.path||t.path==='— 部署说明 —')return;      // 部署说明只进 ZIP，不落盘
+    if(t.path.includes('<'))return;                   // 含占位符的模板（改由名单批量生成）
+    const isQF=/QFunction-0\.txt$/.test(t.path);
+    list.push({path:t.path, text:t.text, name:t.name,
+      mode:(isQF&&chk('fsAppendQF'))?'append':'write'});
+  });
+  // 批量 Dummys 配置：按名单逐个建文件；名单为空则回退为单份模板
+  if(chk('outDummyCfg')){
+    const tmpl=TABS.find(t=>/Dummys/.test(t.name));
+    if(tmpl){
+      const names=val('dummyNames').split(/\r?\n/).map(s=>s.trim())
+        .filter(s=>s&&s!=='<'&&!/[<>:"|?*]/.test(s));   // 过滤非法文件名字符
+      if(chk('batchDummy')&&names.length){
+        names.forEach(n=>list.push({
+          path:`Envir/Dummys/${n}.txt`, text:tmpl.text, name:'Dummys/'+n, mode:'write'}));
+      }else if(!chk('batchDummy')){
+        list.push({path:'Envir/Dummys/_假人配置模板.txt',text:tmpl.text,
+          name:'Dummys/模板',mode:'write'});
+      }
+    }
+  }
+  return list;
+}
+
+/* ---- 选择文件夹 ---- */
+/* 三种受限情况：
+   1. 浏览器无此 API（Firefox/Safari）
+   2. 页面在 iframe 中（预览面板）→ 权限策略默认禁用
+   3. 非安全上下文（http 页面）
+   这三种都要明确告诉用户原因，而不是点了没反应 */
+const IN_IFRAME=(()=>{try{return window.self!==window.top}catch(e){return true}})();
+const IS_SECURE=(()=>location.protocol==='https:'||location.hostname==='localhost'
+  ||location.hostname==='127.0.0.1'||location.protocol==='file:')();
+const FS_BLOCK_REASON=!HAS_FS
+  ? '当前浏览器不支持 File System Access API'
+  : (IN_IFRAME
+      ? '当前页面运行在预览框（iframe）内，浏览器出于安全策略禁止弹出文件夹选择框。请把本文件下载到本地后用 Chrome/Edge 直接打开'
+      : (!IS_SECURE
+          ? '当前页面不是安全上下文（HTTPS/localhost），浏览器禁止访问文件系统。请下载到本地用 Chrome/Edge 打开'
+          : ''));
+if(FS_BLOCK_REASON){
+  $('fsWarn').style.display='block';
+  $('fsWarn').innerHTML='<b>⚠ 无法直接写入文件夹</b>'+FS_BLOCK_REASON+'。'
+    +'可行方案：① 用 Chrome/Edge 直接打开本 HTML 文件；② 直接使用下方「⬇ 打包下载 ZIP」。';
+  $('fsPick').disabled=true;
+  $('fsWrite').disabled=true;
+  $('fsPick').title=FS_BLOCK_REASON;
+}
+$('fsPick').onclick=async()=>{
+  if(FS_BLOCK_REASON){ alert(FS_BLOCK_REASON+'。\n\n请改用「⬇ 打包下载 ZIP」，解压后放进 Mir200 即可。'); return; }
+  try{
+    log('正在打开文件夹选择器…（在弹出的窗口里选中 Mir200 文件夹）');
+    DIR_HANDLE=await window.showDirectoryPicker({id:'mir200',mode:'readwrite'});
+    $('fsRoot').value=DIR_HANDLE.name||'（已选择）';
+    $('fsWrite').disabled=false;
+    log('已选择文件夹：'+DIR_HANDLE.name+'　→ 所有文件将写入其下的 Envir\\ 子目录','ok');
+  }catch(e){
+    if(e.name==='AbortError'){
+      log('你取消了选择（未做任何改动），如需落盘请重新点击','warn');
+    }else{
+      log('选择失败：'+(e.message||e)+'。可能原因是浏览器权限限制，请改用「⬇ 打包下载 ZIP」','err');
+    }
+  }
+};
+
+/* ---- 执行写入 ---- */
+$('fsWrite').onclick=async()=>{
+  if(!DIR_HANDLE){ alert('请先点击「📁 选择 Mir200 文件夹」'); return; }
+  logClear();
+  render();
+  const list=buildFileList();
+  if(!list.length){ log('没有可写入的文件，请检查左侧开关','warn'); return; }
+  log('开始写入 '+list.length+' 个文件…');
+  const btn=$('fsWrite'); btn.disabled=true; btn.textContent='写入中…';
+  let ok=0,skip=0,fail=0;
+  try{
+    const envir=await DIR_HANDLE.getDirectoryHandle('Envir',{create:true});
+    let totalBytes=0;
+    for(const f of list){
+      try{
+        const data=encodeText(f.text,val('encSel'));
+        totalBytes+=data.length;
+        const r=await writeTo(envir,f.path,data,f.mode);
+        ok++;
+        log((r.appended?'追加 ':'写入 ')+f.path+'  ('+(r.appended?('原'+r.size+'B + 新'+r.added+'B'):(r.size+'B'))+')', r.appended?'warn':'ok');
+      }catch(e){
+        fail++;
+        if(e&&(e.name==='NotAllowedError'||e.name==='SecurityError')){
+          log('✗ 权限被拒绝，已中止写入：'+e.message,'err');
+          log('  浏览器可能已收回目录授权，请重新点击「选择 Mir200 文件夹」','warn');
+          break;
+        }
+        log('✗ '+f.path+'：'+(e.message||e),'err');
+      }
+    }
+    log('本次共写入约 '+(totalBytes/1024).toFixed(1)+' KB','ok');
+  }catch(e){
+    log('创建 Envir 目录失败：'+(e.message||e),'err'); fail++;
+  }
+  btn.disabled=false; btn.textContent='💾 写入全部文件';
+  log('完成：成功 '+ok+' 个'+(fail?('，失败 '+fail+' 个'):'')+(fail?'，请检查上方红色条目':''), fail?'err':'ok');
+  if(ok&&!fail) alert('已写入 '+ok+' 个文件到\r\n'+DIR_HANDLE.name+'\\Envir\\\r\n\r\n提示：QFunction-0.txt 为追加方式，原有内容已保留。');
+};
+
+/* ==========================================================================
+   ZIP 打包下载（无需 File System Access 时使用）
+   ========================================================================== */
+function crc32(buf){
+  let c,crc=0xFFFFFFFF;
+  for(let i=0;i<buf.length;i++){
+    c=(crc^buf[i])&0xFF;
+    for(let k=0;k<8;k++)c=c&1?(c>>>1)^0xEDB88320:c>>>1;
+    crc=(crc>>>8)^c;
+  }
+  return (crc^0xFFFFFFFF)>>>0;
+}
+function dosTime(d){
+  return ((d.getHours()<<11)|(d.getMinutes()<<5)|(d.getSeconds()/2))&0xFFFF;
+}
+function dosDate(d){
+  return (((d.getFullYear()-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate())&0xFFFF;
+}
+function makeZip(entries){
+  const parts=[],central=[];let offset=0;const now=new Date();
+  const enc=s=>new TextEncoder().encode(s);
+  const ut=dosTime(now),ud=dosDate(now);
+  entries.forEach(e=>{
+    const nb=enc(e.name), data=e.data, crc=crc32(data);
+    /* 本地文件头 30 字节 + 文件名 */
+    const lh=new Uint8Array(30+nb.length), dv=new DataView(lh.buffer);
+    dv.setUint32(0,0x04034b50,true);      // 签名
+    dv.setUint16(4,20,true);              // 解压所需版本 2.0
+    dv.setUint16(6,0x0800,true);          // 通用标志：文件名 UTF-8
+    dv.setUint16(8,0,true);               // 压缩方式 0=存储
+    dv.setUint16(10,ut,true);             // 修改时间
+    dv.setUint16(12,ud,true);             // 修改日期
+    dv.setUint32(14,crc,true);            // CRC32
+    dv.setUint32(18,data.length,true);    // 压缩后大小
+    dv.setUint32(22,data.length,true);    // 原始大小
+    dv.setUint16(26,nb.length,true);      // 文件名长度
+    dv.setUint16(28,0,true);              // 额外字段长度
+    lh.set(nb,30);
+    parts.push(lh,data);
+    /* 中央目录项 46 字节 + 文件名 */
+    const ch=new Uint8Array(46+nb.length),cv=new DataView(ch.buffer);
+    cv.setUint32(0,0x02014b50,true);      // 签名
+    cv.setUint16(4,20,true);              // 生成版本
+    cv.setUint16(6,20,true);              // 解压版本
+    cv.setUint16(8,0x0800,true);          // 通用标志：UTF-8
+    cv.setUint16(10,0,true);              // 压缩方式 0=存储
+    cv.setUint16(12,ut,true);
+    cv.setUint16(14,ud,true);
+    cv.setUint32(16,crc,true);
+    cv.setUint32(20,data.length,true);
+    cv.setUint32(24,data.length,true);
+    cv.setUint16(28,nb.length,true);      // 文件名长度
+    cv.setUint16(30,0,true);              // 额外字段长度
+    cv.setUint16(32,0,true);              // 注释长度
+    cv.setUint16(34,0,true);              // 起始磁盘号
+    cv.setUint16(36,0,true);              // 内部属性
+    cv.setUint32(38,0x20,true);           // 外部属性：0x20 = 普通文件（否则解压成 0 字节）
+    cv.setUint32(42,offset,true);         // 本地头起始偏移
+    ch.set(nb,46);
+    central.push(ch);
+    offset+=lh.length+data.length;
+  });
+  let cdLen=0;central.forEach(c=>cdLen+=c.length);
+  /* EOCD 22 字节 */
+  const eo=new Uint8Array(22),ev=new DataView(eo.buffer);
+  ev.setUint32(0,0x06054b50,true);
+  ev.setUint16(4,0,true);                 // 磁盘号
+  ev.setUint16(6,0,true);                 // 起始磁盘号
+  ev.setUint16(8,entries.length,true);     // 本磁盘条目数
+  ev.setUint16(10,entries.length,true);    // 总条目数
+  ev.setUint32(12,cdLen,true);            // 中央目录大小
+  ev.setUint32(16,offset,true);           // 中央目录起始偏移
+  ev.setUint16(20,0,true);                // 注释长度
+  return new Blob([...parts,...central,eo],{type:'application/zip'});
+}
+$('dlZip').onclick=()=>{
+  render();
+  const entries=buildFileList().map(f=>({name:f.path,data:encodeText(f.text,val('encSel'))}));
+  TABS.filter(t=>t.path==='— 部署说明 —').forEach(t=>
+    entries.push({name:'部署说明.txt',data:encodeText(t.text,val('encSel'))}));
+  const zip=makeZip(entries);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(zip);
+  a.download='假人脚本包_'+pack()+'.zip';
+  a.click();URL.revokeObjectURL(a.href);
+  alert('已打包 '+entries.length+' 个文件（目录结构已保留），解压后按部署说明放到 Mir200 下即可。');
+};
+
+/* ---------- 初始示例数据 ---------- */
+state.maps=[
+  {map:'D601',min:0,max:20,tip:'进入初级地图，祝您收获满满！'},
+  {map:'D501',min:35,max:30,tip:'进入中级地图，祝您收获满满！'},
+  {map:'SW01',min:45,max:30,tip:'进入高级地图，祝您收获满满！'},
+];
+state.siege=[
+  {map:'0150',x:0,y:0,r:0,p:10},
+  {map:homeMap(),x:643,y:289,r:5,p:10},
+  {map:homeMap(),x:637,y:315,r:2,p:20},
+  {map:homeMap(),x:667,y:285,r:2,p:20},
+];
+state.acts=[
+  {name:'激情泡点',map:'jiqingpaodian',max:50,mode:'只还击(DUMMYSTOP)',rnd:20},
+];
+/* 初始部位：取衣服/武器/勋章/项链/头盔/左右手镯（SLOTS 表单一数据源） */
+state.slots=[0,1,2,3,4,5,6].map(pos=>{
+  const s=slotOf(pos);
+  return {pos, name:'@'+s.name+'更换', var:s.var};
+});
+renderAll();
+render();
+</script>
+</body>
+</html>
